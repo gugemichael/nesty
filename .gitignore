@@ -1,12 +1,25 @@
-*.class
+target
+logs
 
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
+.DS_Store
 
-# Package Files #
-*.jar
-*.war
-*.ear
+.class
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
+.classpath
+.project
+
+*.output
+*.log
+*.gz
+.idea/*
+*.iml
+.settings/
+
+*.swp
+*.back
+*.backup
+nohup.out
+
+*.pyc
+
+lib/
