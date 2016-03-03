@@ -14,7 +14,12 @@
 
 	<dependencies>
 
-	</dependencies>
+        <dependency>
+            <groupId>org.nesty.core</groupId>
+            <artifactId>nesty-core</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
 
 	<build>
 		<finalName>nesty-example</finalName>
