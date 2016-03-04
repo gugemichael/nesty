@@ -9,42 +9,64 @@ Http RESTful Api implemention on Netty async io
 
 ## Usage
 
+* simplest http server
+
 ```java
-package org.nesty.example.httpserver;
 
-import org.nesty.core.httpserver.HttpServer;
-import org.nesty.core.httpserver.impl.async.AsyncHttpServerProvider;
+public static void main(String[] args) {
 
-/**
- * Easy simple http server
- *
- *      [Author] Michael
- *      [Date] March 4, 2016
- *
- */
-public class SimpleHttpServer {
-	public static void main(String[] args) {
+	// start httpserver directly
+	AsyncHttpServerProvider.create("127.0.0.1", 8080)
+						.scanHttpProvider("org.nesty.example.httpserver.handler")
+						.start();
 
-		// 1. create httpserver
-		HttpServer server = AsyncHttpServerProvider.create("127.0.0.1", 8080);
-
-		// 2. choose http params
-		server.setMaxConnections(128);
-		server.setHandlerTimeout(10000);
-		server.setIoThreads(4);
-		server.setHandlerThreads(128);
-		server.scanHttpProvider("org.nesty.example.httpserver.handler");
-
-		// 3. start server and block for servicing
-		if (!server.start()) {
-			System.err.println("HttpServer run failed");
-		}
-
-		// would not to reach here ......
-	}
+	// would not to reach here ......
 }
 ```
 
+* Standerd http server
+
+```java
+
+public static void main(String[] args) {
+
+	// 1. create httpserver
+	HttpServer server = AsyncHttpServerProvider.create("127.0.0.1", 8080);
+
+	// 2. choose http params
+	server.setMaxConnections(128);
+	server.setHandlerTimeout(10000);
+	server.setIoThreads(4);
+	server.setHandlerThreads(128);
+	server.scanHttpProvider("org.nesty.example.httpserver.handler");
+
+	// 3. start server and block for servicing
+	if (!server.start()) {
+		System.err.println("HttpServer run failed");
+	}
+
+	// would not to reach here ......
+}
+```
+
+* Bussiness Controlloer
+
+```java
+
+public class ServiceController {
+
+	@Path("/a")
+	@Method(HttpMethod.GET)
+	public ServiceResponse service() {
+
+		// do somethings like DB operation or 
+		// rpc call or other http request !!
+
+		return new ServiceResponse();
+	}
+}
+
+```
 
 
 ## Threads Model
