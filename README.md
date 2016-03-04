@@ -33,12 +33,12 @@ public static void main(String[] args) {
 	// 1. create httpserver
 	HttpServer server = AsyncHttpServerProvider.create("127.0.0.1", 8080);
 
-	// 2. choose http params
-	server.setMaxConnections(128);
+	// 2. choose server params
+	server.setMaxConnections(1024);
 	server.setHandlerTimeout(10000);
 	server.setIoThreads(4);
-	server.setHandlerThreads(128);
-	server.scanHttpProvider("org.nesty.example.httpserver.handler");
+	server.setHandlerThreads(256);
+	server.scanHttpController("org.nesty.example.httpserver.handler");
 
 	// 3. start server and block for servicing
 	if (!server.start()) {
@@ -49,7 +49,7 @@ public static void main(String[] args) {
 }
 ```
 
-* Bussiness Controlloer
+* Bussiness Controlloer (just like SpringMVC, JettyJersey)
 
 ```java
 
