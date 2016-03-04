@@ -52,16 +52,18 @@ public static void main(String[] args) {
 * Bussiness Controlloer (just like SpringMVC, JettyJersey)
 
 ```java
-
+@Controller
 public class ServiceController {
 
-	@Path("/a")
-	@Method(HttpMethod.GET)
-	public ServiceResponse service() {
+	@RequestMapping(value = "/service/get")
+	public ServiceResponse serviceGet() {
+		System.out.println("ServiceController api serviceGet() called");
+		return new ServiceResponse();
+	}
 
-		// do somethings like DB operation or 
-		// rpc call or other http request !!
-
+	@RequestMapping(value = "/service/post", method = HttpMethod.POST)
+	public ServiceResponse servicePost() {
+		System.out.println("ServiceController api servicePost() called");
 		return new ServiceResponse();
 	}
 }
