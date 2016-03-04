@@ -11,6 +11,7 @@ import io.netty.handler.timeout.ReadTimeoutException;
 import org.nesty.core.httpserver.HttpServer;
 import org.nesty.core.httpserver.rest.HttpResponseBuilder;
 import org.nesty.core.httpserver.rest.NettyHttpRequestVisitor;
+import org.nesty.core.httpserver.rest.URLContext;
 import org.nesty.core.httpserver.rest.handler.BussinessLogicTask;
 import org.nesty.core.httpserver.rest.handler.URLHandler;
 import org.nesty.core.httpserver.rest.route.URLResource;
@@ -59,11 +60,9 @@ public class AsyncRequestRouter extends SimpleChannelInboundHandler<FullHttpRequ
         URLHandler handler = null;
         if ((handler = findURLHandler(resource)) != null) {
             // found url pattern handler
-            ListenableFuture<DefaultFullHttpResponse> task = taskWorkerPool.submit(
-                                                                                        new BussinessLogicTask(
-                                                                                            resource.parse(new NettyHttpRequestVisitor(ctx.channel(), httpRequest)), handler)
-                                                                                        );
-            Futures.addCallback(task, new FutureCallback<DefaultFullHttpResponse>(){
+            BussinessLogicTask task = new BussinessLogicTask(handler, URLContext.build(new NettyHttpRequestVisitor(ctx.channel(), httpRequest)));
+            ListenableFuture<DefaultFullHttpResponse> futureTask = taskWorkerPool.submit(task);
+            Futures.addCallback(futureTask, new FutureCallback<DefaultFullHttpResponse>(){
                 @Override
                 public void onSuccess(DefaultFullHttpResponse resp) {
                     ctx.channel().writeAndFlush(resp).addListener(ChannelFutureListener.CLOSE);

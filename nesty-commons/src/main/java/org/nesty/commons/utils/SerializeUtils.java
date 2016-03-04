@@ -1,4 +1,4 @@
-package org.nesty.core.httpserver.utils;
+package org.nesty.commons.utils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

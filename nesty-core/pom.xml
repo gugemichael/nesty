@@ -29,11 +29,7 @@
             <artifactId>guava-jdk5</artifactId>
             <version>17.0</version>
         </dependency>
-        <dependency>
-            <groupId>com.google.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.2.4</version>
-        </dependency>
+
 
 
     </dependencies>

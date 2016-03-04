@@ -3,8 +3,6 @@ package org.nesty.core.httpserver.rest.route;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import org.nesty.commons.constant.http.HttpMethod;
-import org.nesty.core.httpserver.rest.HttpRequestVisitor;
-import org.nesty.core.httpserver.rest.URLContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,11 +18,6 @@ public class URLResource {
 
     private URLResourceIdentifier identifier;
 
-    /**
-     * http context
-     */
-    private URLContext context;
-
     private URLResource() {
     }
 
@@ -33,23 +26,6 @@ public class URLResource {
         resource.identifier = URLResourceIdentifier.analyse(url);
         resource.identifier.httpMethod = httpMethod;
         return resource;
-    }
-
-    public URLResource parse(HttpRequestVisitor visitor) {
-        context = new URLContext();
-        context.remoteAddress = visitor.accessRemoteAddress();
-        context.httpMethod = visitor.accessHttpMethod();
-        context.httpHeaders = visitor.accessHttpHeaders();
-        context.httpParams = visitor.accessHttpParams();
-
-        if (context.httpMethod != HttpMethod.GET)
-            context.httpBody = visitor.accessHttpBody();
-
-        return this;
-    }
-
-    public URLContext getURLContext() {
-        return context;
     }
 
     @Override

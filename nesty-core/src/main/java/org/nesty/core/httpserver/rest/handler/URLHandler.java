@@ -1,9 +1,18 @@
 package org.nesty.core.httpserver.rest.handler;
 
-import org.nesty.core.httpserver.utils.SerializeUtils;
+import org.nesty.commons.annotations.Body;
+import org.nesty.commons.annotations.PathVariable;
+import org.nesty.commons.annotations.RequestParam;
+import org.nesty.commons.utils.SerializeUtils;
+import org.nesty.commons.utils.Tuple;
+import org.nesty.core.httpserver.impl.async.HttpResultStatus;
+import org.nesty.core.httpserver.rest.URLContext;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * nesty
@@ -33,7 +42,26 @@ public class URLHandler {
         return procedure;
     }
 
-    public byte[] invoke() {
+    public Tuple<HttpResultStatus, byte[]> invoke(URLContext context) {
+        List<Object> paramsList = new LinkedList<>();
+        String key, value;
+
+        Annotation[][] annotations = procedure.getParameterAnnotations();
+        for (Annotation[] paramsAnnotation : annotations) {
+            Annotation annotation = paramsAnnotation[0];
+            if (annotation instanceof RequestParam) {
+                key = ((RequestParam) annotation).value();
+//                value = context.httpParams.get(key);
+//                if (value == null) {
+//                    return new Tuple<HttpResultStatus, byte[]>(HttpResultStatus.PARAMS_NOT_MATCHED, null);
+//                } else
+//                    paramsList.add();
+            } else if (annotation instanceof PathVariable) {
+
+            } else if (annotation instanceof Body) {
+
+            }
+        }
 
         /**
          * make new controller class instance with every http request. because
@@ -47,12 +75,12 @@ public class URLHandler {
             Object target = provider.newInstance();
             Object result = procedure.invoke(target);
             if (!result.getClass().isPrimitive())
-                return SerializeUtils.format(result);
+                return new Tuple<HttpResultStatus, byte[]>(HttpResultStatus.SUCCESS, SerializeUtils.format(result));
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
 
-        return null;
+        return new Tuple<HttpResultStatus, byte[]>(HttpResultStatus.INTERNAL_ERROR, null);
     }
 
     @Override

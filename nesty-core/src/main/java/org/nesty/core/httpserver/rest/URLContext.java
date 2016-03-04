@@ -37,4 +37,21 @@ public class URLContext {
      * Header values
      */
     public Map<String, String> httpHeaders;
+
+    private URLContext() {
+
+    }
+
+    public static URLContext build(HttpRequestVisitor visitor) {
+        URLContext context = new URLContext();
+        context.remoteAddress = visitor.accessRemoteAddress();
+        context.httpMethod = visitor.accessHttpMethod();
+        context.httpHeaders = visitor.accessHttpHeaders();
+        context.httpParams = visitor.accessHttpParams();
+
+        if (context.httpMethod != HttpMethod.GET)
+            context.httpBody = visitor.accessHttpBody();
+
+        return context;
+    }
 }

@@ -1,6 +1,7 @@
 package org.nesty.core.httpserver;
 
 import org.nesty.commons.PackageScanner;
+import org.nesty.commons.annotations.Controller;
 import org.nesty.commons.constant.http.HttpMethod;
 import org.nesty.commons.exception.NestyControllerScanException;
 import org.nesty.core.httpserver.rest.handler.URLHandler;
@@ -40,23 +41,25 @@ public abstract class ScanableHttpServerProvider extends HttpServerProvider {
         }
 
         for (Class<?> clazz : classList) {
+            // only analyze annotated with @Controller
+            if (clazz.getAnnotation(Controller.class) == null)
+                continue;
+
             // find all annotationed method in class
             Method[] methods = clazz.getMethods();
             for (Method method : methods) {
                 if (Modifier.isStatic(method.getModifiers()) || method.getAnnotations().length == 0)
                     continue;
 
-                // read @Method
-                org.nesty.commons.annotations.Method annoMethod = method.getAnnotation(org.nesty.commons.annotations.Method.class);
-                if (annoMethod == null)
+                // read @RequestMapping
+                org.nesty.commons.annotations.RequestMapping requestMapping = method.getAnnotation(org.nesty.commons.annotations.RequestMapping.class);
+                if (requestMapping == null || !requestMapping.value().contains("/"))
                     continue;
-                HttpMethod httpMethod = annoMethod.value();
 
-                // read @Path
-                org.nesty.commons.annotations.Path annoPath = method.getAnnotation(org.nesty.commons.annotations.Path.class);
-                if (annoPath == null || !annoPath.value().contains("/"))
-                    continue;
-                String url = annoPath.value();
+                String url = requestMapping.value();
+
+                // default is HttpMethod.GET if method annotation is not set
+                HttpMethod httpMethod = requestMapping.method();
 
                 URLResource urlResource = URLResource.fromHttp(url, httpMethod);
                 URLHandler urlHandler = URLHandler.fromProvider(clazz, method);
