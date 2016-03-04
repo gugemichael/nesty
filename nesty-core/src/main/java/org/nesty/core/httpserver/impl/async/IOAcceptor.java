@@ -9,6 +9,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
+import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import org.nesty.core.httpserver.HttpServerProvider;
@@ -67,7 +68,8 @@ public class IOAcceptor {
                     public void initChannel(SocketChannel ch) throws Exception {
                         ch.pipeline()
                                 .addLast("nesty-timer", new ReadTimeoutHandler(httpServer.getHandlerTimeout(), TimeUnit.MILLISECONDS))
-                                .addLast("nesty-http-decoder", new HttpObjectAggregator(httpServer.getMaxPacketSize()))
+                                .addLast("nesty-http-decoder", new HttpRequestDecoder())
+                                .addLast("nesty-http-aggregator", new HttpObjectAggregator(httpServer.getMaxPacketSize()))
                                 .addLast("nesty-request-poster", AsyncRequestRouter.build(httpServer))
                                 .addLast("nesty-http-encoder", new HttpResponseEncoder());
                         ;

@@ -1,14 +1,54 @@
 # Nesty
 Http RESTful Api implemention on Netty async io
 
-## 1. Features
+## Features
 
 * Http HTTP/1.1 protocol. support GET/POST/UPDATE/DELETE
 * Http Restful serialized and formatted(json) in string or Json body (With Gson)
 * Http short connection on async mode by default (With Netty 4.2)
 
-## 2. Threads Model
+## Usage
+
+```java
+package org.nesty.example.httpserver;
+
+import org.nesty.core.httpserver.HttpServer;
+import org.nesty.core.httpserver.impl.async.AsyncHttpServerProvider;
+
+/**
+ * Easy simple http server
+ *
+ *      [Author] Michael
+ *      [Date] March 4, 2016
+ *
+ */
+public class SimpleHttpServer {
+	public static void main(String[] args) {
+
+		// 1. create httpserver
+		HttpServer server = AsyncHttpServerProvider.create("127.0.0.1", 8080);
+
+		// 2. choose http params
+		server.setMaxConnections(128);
+		server.setHandlerTimeout(10000);
+		server.setIoThreads(4);
+		server.setHandlerThreads(128);
+		server.scanHttpProvider("org.nesty.example.httpserver.handler");
+
+		// 3. start server and block for servicing
+		if (!server.start()) {
+			System.err.println("HttpServer run failed");
+		}
+
+		// would not to reach here ......
+	}
+}
+```
+
+
+
+## Threads Model
 
 * Netty Bootstrap(io threads) + ThreadPool(logic threads)
 
-## 3. Performance
+## Performance

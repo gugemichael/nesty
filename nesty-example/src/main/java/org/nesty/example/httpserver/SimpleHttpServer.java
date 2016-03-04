@@ -1,13 +1,14 @@
 package org.nesty.example.httpserver;
 
-
 import org.nesty.core.httpserver.HttpServer;
 import org.nesty.core.httpserver.impl.async.AsyncHttpServerProvider;
 
 /**
- * nesty-example
+ * Easy simple http server
  *
- * Author Michael on 03/03/2016
+ *      [Author] Michael
+ *      [Date] March 4, 2016
+ *
  */
 public class SimpleHttpServer {
     public static void main(String[] args) {
@@ -17,15 +18,17 @@ public class SimpleHttpServer {
 
         // 2. choose http params
         server.setMaxConnections(128);
+        server.setHandlerTimeout(10000);
         server.setIoThreads(4);
         server.setHandlerThreads(128);
-        server.scanHttpProvider("org.nesty.example.httpserver");
+        server.scanHttpProvider("org.nesty.example.httpserver.handler");
 
-        // 3. start server
+        // 3. start server and block for servicing
         if (!server.start()) {
             System.err.println("HttpServer run failed");
         }
 
-        System.out.println("DONE");
+        // would not to reach here ......
     }
 }
+
