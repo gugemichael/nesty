@@ -12,7 +12,7 @@ import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
 import io.netty.handler.timeout.ReadTimeoutHandler;
-import org.nesty.core.httpserver.HttpServerProvider;
+import org.nesty.core.httpserver.ScanableHttpServerProvider;
 
 import java.util.concurrent.TimeUnit;
 
@@ -26,9 +26,9 @@ public class IOAcceptor {
     private final String address;
     private final int port;
 
-    private final HttpServerProvider httpServer;
+    private final ScanableHttpServerProvider httpServer;
 
-    public IOAcceptor(HttpServerProvider httpServer, String address, int port) {
+    public IOAcceptor(ScanableHttpServerProvider httpServer, String address, int port) {
         this.address = address;
         this.port = port;
         this.httpServer = httpServer;
@@ -59,6 +59,7 @@ public class IOAcceptor {
 
         // initial request router's work threads
         AsyncRequestRouter.newTaskPool(httpServer.getHandlerThreads());
+        AsyncRequestRouter.newURLResourceController(httpServer.getControllers());
 
         ServerBootstrap socketServer = new ServerBootstrap();
         socketServer.group(bossGroup, workerGroup)
@@ -92,4 +93,11 @@ public class IOAcceptor {
         bossGroup.shutdownGracefully();
     }
 
+    public String getAddress() {
+        return address;
+    }
+
+    public int getPort() {
+        return port;
+    }
 }

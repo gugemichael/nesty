@@ -1,4 +1,4 @@
-package org.nesty.core.exception;
+package org.nesty.commons.exception;
 
 /**
  * nesty

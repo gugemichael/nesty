@@ -7,16 +7,15 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.timeout.ReadTimeoutException;
 import org.nesty.core.httpserver.HttpServer;
+import org.nesty.core.httpserver.rest.HttpResponseBuilder;
 import org.nesty.core.httpserver.rest.NettyHttpRequestVisitor;
 import org.nesty.core.httpserver.rest.handler.BussinessLogicTask;
 import org.nesty.core.httpserver.rest.handler.URLHandler;
 import org.nesty.core.httpserver.rest.route.URLResource;
 import org.nesty.core.httpserver.utils.HttpUtils;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executors;
 
@@ -27,12 +26,11 @@ import java.util.concurrent.Executors;
  */
 public class AsyncRequestRouter extends SimpleChannelInboundHandler<FullHttpRequest> {
 
-//    private static final ByteBuf error = Unpooled.wrappedBuffer("404".getBytes());
-
     /**
      * Restful mapping
      */
-    private static final Map<URLResource, URLHandler> routeTable = new HashMap<>(128);
+    private static volatile Map<URLResource, URLHandler> controller;
+
     /**
      * Async workers
      */
@@ -42,17 +40,24 @@ public class AsyncRequestRouter extends SimpleChannelInboundHandler<FullHttpRequ
         taskWorkerPool = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(workers));
     }
 
+    public static void newURLResourceController(Map<URLResource, URLHandler> urlController) {
+        controller = urlController;
+    }
+
     public static AsyncRequestRouter build(HttpServer httpServer) {
         AsyncRequestRouter router = new AsyncRequestRouter();
         return router;
     }
 
+    public URLHandler findURLHandler(URLResource resource) {
+        return controller.get(resource);
+    }
+
     @Override
     protected void channelRead0(final ChannelHandlerContext ctx, final FullHttpRequest httpRequest) throws Exception {
-        System.err.println("---------------");
         URLResource resource = URLResource.fromHttp(httpRequest.getUri(), HttpUtils.convertHttpMethodFromNetty(httpRequest));
         URLHandler handler = null;
-        if ((handler = routeTable.get(resource)) != null) {
+        if ((handler = findURLHandler(resource)) != null) {
             // found url pattern handler
             ListenableFuture<DefaultFullHttpResponse> task = taskWorkerPool.submit(
                                                                                         new BussinessLogicTask(
@@ -82,6 +87,6 @@ public class AsyncRequestRouter extends SimpleChannelInboundHandler<FullHttpRequ
     }
 
     private DefaultFullHttpResponse errorResponse(HttpResponseStatus status) {
-       return new DefaultFullHttpResponse(HttpVersion.HTTP_1_0, status);
+       return HttpResponseBuilder.create(status);
     }
 }

@@ -1,20 +1,14 @@
 package org.nesty.core.httpserver.impl.async;
 
 import org.nesty.core.httpserver.HttpServer;
-import org.nesty.core.httpserver.HttpServerProvider;
+import org.nesty.core.httpserver.ScanableHttpServerProvider;
 
 /**
  * nesty
  *
  * Author Michael on 03/03/2016.
  */
-public class AsyncHttpServerProvider extends HttpServerProvider {
-
-    /**
-     * listened local address and port
-     */
-    private final String address;
-    private final Integer port;
+public class AsyncHttpServerProvider extends ScanableHttpServerProvider {
 
     /**
      * http protocol acceptor
@@ -22,8 +16,6 @@ public class AsyncHttpServerProvider extends HttpServerProvider {
     private final IOAcceptor ioAcceptor;
 
     public AsyncHttpServerProvider(String address, Integer port) {
-        this.address = address;
-        this.port = port;
         this.ioAcceptor = new IOAcceptor(this, address, port);
     }
 

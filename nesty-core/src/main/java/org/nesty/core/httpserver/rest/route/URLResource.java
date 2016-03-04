@@ -53,13 +53,20 @@ public class URLResource {
     }
 
     @Override
+    public String toString() {
+        return String.format("identifier=%s", identifier.toString());
+    }
+
+    @Override
     public int hashCode() {
         return identifier.hashCode();
     }
 
     @Override
     public boolean equals(Object other) {
-        return identifier.equals(other);
+        if (other == null || !(other instanceof URLResource))
+            return false;
+        return identifier.equals(((URLResource) other).identifier);
     }
 
     /**
@@ -98,6 +105,11 @@ public class URLResource {
         @Override
         public int hashCode() {
             return Joiner.on('.').skipNulls().join(fragments).hashCode() + httpMethod.name().hashCode();
+        }
+
+        @Override
+        public String toString() {
+            return String.format("fragments=%s,httpMethod=%s", Joiner.on("/").skipNulls().join(fragments), httpMethod.name());
         }
     }
 }

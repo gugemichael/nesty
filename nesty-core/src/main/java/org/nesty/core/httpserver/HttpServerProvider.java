@@ -58,13 +58,7 @@ public abstract class HttpServerProvider implements HttpServer {
 
     @Override
     public HttpServer setHandlerThreads(int handlerThreads) {
-        return this;
-    }
-
-    @Override
-    public HttpServer scanHttpProvider(String packageName) {
-
-
+        this.handlerThreads = handlerThreads;
         return this;
     }
 
@@ -76,6 +70,7 @@ public abstract class HttpServerProvider implements HttpServer {
 
     @Override
     public HttpServer setMaxPacketSize(int maxPacketSize) {
+        this.maxPacketSize = maxPacketSize;
         return null;
     }
 

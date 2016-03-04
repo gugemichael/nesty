@@ -4,9 +4,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.HttpVersion;
-import org.nesty.commons.constant.http.HttpConstants;
-import org.nesty.commons.constant.NestyConstants;
+import org.nesty.core.httpserver.rest.HttpResponseBuilder;
 import org.nesty.core.httpserver.rest.route.URLResource;
 
 import java.util.concurrent.Callable;
@@ -28,20 +26,14 @@ public class BussinessLogicTask implements Callable<DefaultFullHttpResponse> {
 
     @Override
     public DefaultFullHttpResponse call() {
-        HttpResponseStatus status = HttpResponseStatus.OK;
 
-        ByteBuf content = null;
-        content = Unpooled.wrappedBuffer(handler.invoke());
+        // call controller corresponding method
+        byte[] result = handler.invoke();
 
-        DefaultFullHttpResponse resp;
-        if (content != null) {
-            resp = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status, content);
-            resp.headers().set(HttpConstants.HEADER_CONTENT_LENGTH, content.readableBytes());
+        if (result != null && result.length != 0) {
+            ByteBuf content = Unpooled.wrappedBuffer(result);
+            return HttpResponseBuilder.create(content);
         } else
-            resp = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status);
-
-        resp.headers().set(HttpConstants.HEADER_SERVER, NestyConstants.NESTY_SERVER);
-
-        return resp;
+            return HttpResponseBuilder.create(HttpResponseStatus.NO_CONTENT);
     }
 }

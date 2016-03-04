@@ -7,5 +7,5 @@ package org.nesty.commons.constant;
  */
 public class NestyConstants {
 
-    public static final String NESTY_SERVER = "nesty";
+    public static final String NESTY_SERVER = "Nesty";
 }
