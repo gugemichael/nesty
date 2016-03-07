@@ -17,7 +17,7 @@ public static void main(String[] args) {
 
 	// start httpserver directly
 	AsyncHttpServerProvider.create("127.0.0.1", 8080)
-						.scanHttpProvider("org.nesty.example.httpserver.handler")
+						.scanHttpController("org.nesty.example.httpserver.handler")
 						.start();
 
 	// would not to reach here ......

@@ -31,7 +31,7 @@ public class NettyHttpRequestVisitor implements HttpRequestVisitor {
     }
 
     @Override
-    public String accessRemoteAddress() {
+    public String visitRemoteAddress() {
         for (Map.Entry<String, String> entry : request.headers()) {
             if (entry.getKey().equals(HttpConstants.HEADER_X_FORWARDED_FOR))
                 return entry.getValue();
@@ -40,17 +40,17 @@ public class NettyHttpRequestVisitor implements HttpRequestVisitor {
     }
 
     @Override
-    public HttpMethod accessHttpMethod() {
+    public HttpMethod visitHttpMethod() {
         return HttpUtils.convertHttpMethodFromNetty(request);
     }
 
     @Override
-    public String accessHttpBody() {
+    public String visitHttpBody() {
         return request.content().toString(CharsetUtil.UTF_8);
     }
 
     @Override
-    public Map<String, String> accessHttpParams() {
+    public Map<String, String> visitHttpParams() {
         Map<String, String> params = new HashMap<>(32);
 
         // from URL
@@ -59,9 +59,9 @@ public class NettyHttpRequestVisitor implements HttpRequestVisitor {
             params.put(item.getKey(), item.getValue().get(0));
 
         // query string and body
-        if (accessHttpMethod() != HttpMethod.GET) {
+        if (visitHttpMethod() != HttpMethod.GET) {
             // from content body key-value
-            QueryStringDecoder kvDecoder = new QueryStringDecoder(accessHttpBody(), Charset.forName("UTF-8"), false);
+            QueryStringDecoder kvDecoder = new QueryStringDecoder(visitHttpBody(), Charset.forName("UTF-8"), false);
             for (Map.Entry<String, List<String>> item : kvDecoder.parameters().entrySet())
                 params.put(item.getKey(), item.getValue().get(0));
         }
@@ -70,7 +70,7 @@ public class NettyHttpRequestVisitor implements HttpRequestVisitor {
     }
 
     @Override
-    public Map<String, String> accessHttpHeaders() {
+    public Map<String, String> visitHttpHeaders() {
         Map<String, String> headers = new HashMap<>(32);
         Iterator<Map.Entry<String, String>> itr = request.headers().iterator();
         while (itr.hasNext()) {

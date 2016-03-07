@@ -44,13 +44,13 @@ public class URLContext {
 
     public static URLContext build(HttpRequestVisitor visitor) {
         URLContext context = new URLContext();
-        context.remoteAddress = visitor.accessRemoteAddress();
-        context.httpMethod = visitor.accessHttpMethod();
-        context.httpHeaders = visitor.accessHttpHeaders();
-        context.httpParams = visitor.accessHttpParams();
+        context.remoteAddress = visitor.visitRemoteAddress();
+        context.httpMethod = visitor.visitHttpMethod();
+        context.httpHeaders = visitor.visitHttpHeaders();
+        context.httpParams = visitor.visitHttpParams();
 
         if (context.httpMethod != HttpMethod.GET)
-            context.httpBody = visitor.accessHttpBody();
+            context.httpBody = visitor.visitHttpBody();
 
         return context;
     }

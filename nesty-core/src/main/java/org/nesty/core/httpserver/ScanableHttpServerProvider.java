@@ -5,13 +5,12 @@ import org.nesty.commons.annotations.Controller;
 import org.nesty.commons.constant.http.HttpMethod;
 import org.nesty.commons.exception.NestyControllerScanException;
 import org.nesty.core.httpserver.rest.handler.URLHandler;
+import org.nesty.core.httpserver.rest.route.RouteControlloer;
 import org.nesty.core.httpserver.rest.route.URLResource;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * nesty
@@ -22,7 +21,7 @@ import java.util.Map;
  */
 public abstract class ScanableHttpServerProvider extends HttpServerProvider {
 
-    private Map<URLResource, URLHandler> controller = new HashMap<>(256);
+    private RouteControlloer routeControlloer;
 
     /**
      * scan specified package's all classes
@@ -31,6 +30,7 @@ public abstract class ScanableHttpServerProvider extends HttpServerProvider {
 
     @Override
     public HttpServer scanHttpController(String packageName) throws NestyControllerScanException {
+        RouteControlloer.ConcurrentReadRouteMap relation = new RouteControlloer.ConcurrentReadRouteMap();
 
         // find all Class
         List<Class<?>> classList = null;
@@ -65,23 +65,19 @@ public abstract class ScanableHttpServerProvider extends HttpServerProvider {
                 URLHandler urlHandler = URLHandler.fromProvider(clazz, method);
 
                 // register
-                controller.put(urlResource, urlHandler);
+                relation.put(urlResource, urlHandler);
 
                 System.err.println(urlHandler.toString());
             }
         }
 
+        routeControlloer = new RouteControlloer(relation);
+
         return this;
     }
 
-    public Map<URLResource, URLHandler> getControllers() {
-        return controller;
+    public RouteControlloer getRouteController() {
+        return routeControlloer;
     }
 
-
-//    public static void main(String[] args) {
-//        List<Class<?>> classes = new PackageScanner().scan(Joiner.class.getPackage().getName());
-//        for (Class<?> c : classes)
-//            System.out.println(c.getName());
-//    }
 }

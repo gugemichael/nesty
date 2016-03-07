@@ -11,13 +11,13 @@ import java.util.Map;
  */
 public interface HttpRequestVisitor {
 
-    String accessRemoteAddress();
+    String visitRemoteAddress();
 
-    HttpMethod accessHttpMethod();
+    HttpMethod visitHttpMethod();
 
-    String accessHttpBody();
+    String visitHttpBody();
 
-    Map<String, String> accessHttpParams();
+    Map<String, String> visitHttpParams();
 
-    Map<String, String> accessHttpHeaders();
+    Map<String, String> visitHttpHeaders();
 }

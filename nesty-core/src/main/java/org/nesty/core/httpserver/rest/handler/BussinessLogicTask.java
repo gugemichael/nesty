@@ -30,12 +30,25 @@ public class BussinessLogicTask implements Callable<DefaultFullHttpResponse> {
     public DefaultFullHttpResponse call() {
 
         // call controller corresponding method
-        Tuple<HttpResultStatus, byte[]> result = handler.invoke(context);
+        Tuple<HttpResultStatus, byte[]> result = handler.call(context);
 
-        if (result.first == HttpResultStatus.SUCCESS && result.second != null && result.second.length != 0) {
-            ByteBuf content = Unpooled.wrappedBuffer(result.second);
-            return HttpResponseBuilder.create(content);
-        } else
-            return HttpResponseBuilder.create(HttpResponseStatus.NO_CONTENT);
+        switch (result.first) {
+        case SUCCESS:
+            if (result.second != null && result.second.length != 0) {
+                ByteBuf content = Unpooled.wrappedBuffer(result.second);
+                return HttpResponseBuilder.create(content);
+            } else
+                return HttpResponseBuilder.create(HttpResponseStatus.NO_CONTENT);
+        case RESPONSE_NOT_VALID:
+            return HttpResponseBuilder.create(HttpResponseStatus.NOT_EXTENDED);
+        case PARAMS_CONVERT_ERROR:
+        case PARAMS_NOT_MATCHED:
+            return HttpResponseBuilder.create(HttpResponseStatus.BAD_REQUEST);
+        case SYSTEM_ERROR:
+            return HttpResponseBuilder.create(HttpResponseStatus.BAD_GATEWAY);
+        default:
+            return HttpResponseBuilder.create(HttpResponseStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 }

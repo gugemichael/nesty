@@ -14,10 +14,10 @@ import org.nesty.core.httpserver.rest.NettyHttpRequestVisitor;
 import org.nesty.core.httpserver.rest.URLContext;
 import org.nesty.core.httpserver.rest.handler.BussinessLogicTask;
 import org.nesty.core.httpserver.rest.handler.URLHandler;
+import org.nesty.core.httpserver.rest.route.RouteControlloer;
 import org.nesty.core.httpserver.rest.route.URLResource;
 import org.nesty.core.httpserver.utils.HttpUtils;
 
-import java.util.Map;
 import java.util.concurrent.Executors;
 
 /**
@@ -28,9 +28,9 @@ import java.util.concurrent.Executors;
 public class AsyncRequestRouter extends SimpleChannelInboundHandler<FullHttpRequest> {
 
     /**
-     * Restful mapping
+     * resource controller route mapping
      */
-    private static volatile Map<URLResource, URLHandler> controller;
+    private static volatile RouteControlloer routeController;
 
     /**
      * Async workers
@@ -41,8 +41,8 @@ public class AsyncRequestRouter extends SimpleChannelInboundHandler<FullHttpRequ
         taskWorkerPool = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(workers));
     }
 
-    public static void newURLResourceController(Map<URLResource, URLHandler> urlController) {
-        controller = urlController;
+    public static void newURLResourceController(RouteControlloer routeControllerMap) {
+        routeController = routeControllerMap;
     }
 
     public static AsyncRequestRouter build(HttpServer httpServer) {
@@ -50,27 +50,24 @@ public class AsyncRequestRouter extends SimpleChannelInboundHandler<FullHttpRequ
         return router;
     }
 
-    public URLHandler findURLHandler(URLResource resource) {
-        return controller.get(resource);
-    }
-
     @Override
     protected void channelRead0(final ChannelHandlerContext ctx, final FullHttpRequest httpRequest) throws Exception {
         URLResource resource = URLResource.fromHttp(httpRequest.getUri(), HttpUtils.convertHttpMethodFromNetty(httpRequest));
         URLHandler handler = null;
-        if ((handler = findURLHandler(resource)) != null) {
+        if ((handler = routeController.findURLHandler(resource)) != null) {
             // found url pattern handler
             BussinessLogicTask task = new BussinessLogicTask(handler, URLContext.build(new NettyHttpRequestVisitor(ctx.channel(), httpRequest)));
             ListenableFuture<DefaultFullHttpResponse> futureTask = taskWorkerPool.submit(task);
-            Futures.addCallback(futureTask, new FutureCallback<DefaultFullHttpResponse>(){
+            Futures.addCallback(futureTask, new FutureCallback<DefaultFullHttpResponse>() {
                 @Override
                 public void onSuccess(DefaultFullHttpResponse resp) {
                     ctx.channel().writeAndFlush(resp).addListener(ChannelFutureListener.CLOSE);
                 }
 
                 @Override
-                public void onFailure(Throwable throwable) {
-                    ctx.channel().writeAndFlush(errorResponse(HttpResponseStatus.INTERNAL_SERVER_ERROR)).addListener(ChannelFutureListener.CLOSE);
+                public void onFailure(Throwable e) {
+                    e.printStackTrace();
+                    ctx.channel().writeAndFlush(errorResponse(HttpResponseStatus.SERVICE_UNAVAILABLE)).addListener(ChannelFutureListener.CLOSE);
                 }
             });
         } else {
@@ -86,6 +83,6 @@ public class AsyncRequestRouter extends SimpleChannelInboundHandler<FullHttpRequ
     }
 
     private DefaultFullHttpResponse errorResponse(HttpResponseStatus status) {
-       return HttpResponseBuilder.create(status);
+        return HttpResponseBuilder.create(status);
     }
 }
