@@ -40,6 +40,7 @@ public class ServiceController {
 
 ```
 
+More examples. Please visit https://github.com/gugemichael/nesty/wiki/More-Examples
 
 ## Threads Model
 
