@@ -7,9 +7,9 @@
 	<packaging>pom</packaging>
 	<version>0.0.1-SNAPSHOT</version>
 	<modules>
-        <module>nesty-commons</module>
-		<module>nesty-core</module>
-		<module>nesty-example</module>
+        <module>commons</module>
+		<module>core</module>
+		<module>example</module>
 	</modules>
 
 
