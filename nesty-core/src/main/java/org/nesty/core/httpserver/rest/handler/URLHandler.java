@@ -1,11 +1,12 @@
 package org.nesty.core.httpserver.rest.handler;
 
+import org.nesty.commons.exception.ControllerParamsNotMatchException;
+import org.nesty.commons.exception.ControllerParamsParsedException;
 import org.nesty.commons.utils.SerializeUtils;
 import org.nesty.commons.utils.Tuple;
 import org.nesty.core.httpserver.impl.async.HttpResultStatus;
 import org.nesty.core.httpserver.rest.URLContext;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.List;
@@ -25,10 +26,10 @@ public class URLHandler {
     private URLHandler() {
     }
 
-    public static URLHandler fromProvider(Class<?> provider, Method procedure) {
+    public static URLHandler fromProvider(String URI, Class<?> provider, Method procedure) {
         URLHandler handler = new URLHandler();
         handler.provider = new ControllerClassDescriptor(provider);
-        handler.procedure = new ControllerMethodDescriptor(procedure);
+        handler.procedure = new ControllerMethodDescriptor(URI, procedure);
         return handler;
     }
 
@@ -47,14 +48,14 @@ public class URLHandler {
         try {
             Object result = procedure.invoke(provider, context);
             if (!result.getClass().isPrimitive())
-                return new Tuple<HttpResultStatus, byte[]>(HttpResultStatus.SUCCESS, SerializeUtils.format(result));
+                return new Tuple<HttpResultStatus, byte[]>(HttpResultStatus.SUCCESS, SerializeUtils.encode(result));
             else
-                return new Tuple<HttpResultStatus, byte[]>(HttpResultStatus.RESPONSE_NOT_VALID, null);
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+                return new Tuple<HttpResultStatus, byte[]>(HttpResultStatus.RESPONSE_NOT_VALID);
+        } catch (ControllerParamsNotMatchException e) {
+            return new Tuple<HttpResultStatus, byte[]>(HttpResultStatus.PARAMS_NOT_MATCHED);
+        } catch(ControllerParamsParsedException e) {
+            return new Tuple<HttpResultStatus, byte[]>(HttpResultStatus.PARAMS_CONVERT_ERROR);
         }
-
-        return new Tuple<HttpResultStatus, byte[]>(HttpResultStatus.SYSTEM_ERROR, null);
     }
 
     @Override

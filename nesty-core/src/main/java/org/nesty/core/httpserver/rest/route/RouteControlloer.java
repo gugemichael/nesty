@@ -35,8 +35,8 @@ public class RouteControlloer {
     public static class ConcurrentReadRouteMap {
         private Map<URLResource, URLHandler> map = new HashMap<>(128);
 
-        public synchronized void put(URLResource resource, URLHandler handler) {
-            this.map.put(resource, handler);
+        public synchronized boolean put(URLResource resource, URLHandler handler) {
+            return this.map.put(resource, handler) == null;
         }
 
         public URLHandler get(URLResource resource) {

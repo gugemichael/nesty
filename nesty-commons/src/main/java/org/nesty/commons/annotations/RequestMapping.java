@@ -1,6 +1,6 @@
 package org.nesty.commons.annotations;
 
-import org.nesty.commons.constant.http.HttpMethod;
+import org.nesty.commons.constant.http.RequestMethod;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -11,5 +11,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RequestMapping {
     String value();
-    HttpMethod method() default HttpMethod.GET;
+    RequestMethod method() default RequestMethod.GET;
 }

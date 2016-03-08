@@ -1,6 +1,6 @@
 package org.nesty.core.httpserver.rest;
 
-import org.nesty.commons.constant.http.HttpMethod;
+import org.nesty.commons.constant.http.RequestMethod;
 
 import java.util.Map;
 import java.util.UUID;
@@ -25,9 +25,21 @@ public class URLContext {
     public String remoteAddress;
 
     /**
+     * whole http url exclude query string
+     *
+     */
+    public String url;
+
+    /**
+     * http url terms split by "/"
+     *
+     */
+    public String[] terms;
+
+    /**
      * Http request method. can't be null
      */
-    public HttpMethod httpMethod;
+    public RequestMethod requestMethod;
 
     public String httpBody;
 
@@ -45,11 +57,13 @@ public class URLContext {
     public static URLContext build(HttpRequestVisitor visitor) {
         URLContext context = new URLContext();
         context.remoteAddress = visitor.visitRemoteAddress();
-        context.httpMethod = visitor.visitHttpMethod();
+        context.url = visitor.visitURL();
+        context.terms = visitor.visitTerms();
+        context.requestMethod = visitor.visitHttpMethod();
         context.httpHeaders = visitor.visitHttpHeaders();
         context.httpParams = visitor.visitHttpParams();
 
-        if (context.httpMethod != HttpMethod.GET)
+        if (context.requestMethod != RequestMethod.GET)
             context.httpBody = visitor.visitHttpBody();
 
         return context;

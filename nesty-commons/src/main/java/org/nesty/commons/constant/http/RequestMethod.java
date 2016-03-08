@@ -5,6 +5,6 @@ package org.nesty.commons.constant.http;
  *
  * Author Michael on 03/03/2016.
  */
-public enum HttpMethod {
+public enum RequestMethod {
     GET, POST, UPDATE, DELETE, UNKOWN
 }

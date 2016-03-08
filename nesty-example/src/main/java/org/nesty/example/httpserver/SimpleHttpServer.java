@@ -1,6 +1,6 @@
 package org.nesty.example.httpserver;
 
-import org.nesty.commons.exception.NestyControllerScanException;
+import org.nesty.commons.exception.ControllerRequestMappingException;
 import org.nesty.core.httpserver.HttpServer;
 import org.nesty.core.httpserver.impl.async.AsyncHttpServerProvider;
 
@@ -13,7 +13,7 @@ import org.nesty.core.httpserver.impl.async.AsyncHttpServerProvider;
  */
 public class SimpleHttpServer {
 
-    public static void main(String[] args) throws NestyControllerScanException {
+    public static void main(String[] args) throws ControllerRequestMappingException {
 
         // 1. create httpserver
         HttpServer server = AsyncHttpServerProvider.create("127.0.0.1", 8080);

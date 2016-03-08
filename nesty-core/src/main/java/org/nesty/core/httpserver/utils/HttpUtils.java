@@ -1,7 +1,7 @@
 package org.nesty.core.httpserver.utils;
 
 import io.netty.handler.codec.http.FullHttpRequest;
-import org.nesty.commons.constant.http.HttpMethod;
+import org.nesty.commons.constant.http.RequestMethod;
 
 /**
  * nesty
@@ -10,11 +10,11 @@ import org.nesty.commons.constant.http.HttpMethod;
  */
 public class HttpUtils {
 
-    public static HttpMethod convertHttpMethodFromNetty(FullHttpRequest request) {
+    public static RequestMethod convertHttpMethodFromNetty(FullHttpRequest request) {
         try {
-            return HttpMethod.valueOf(request.getMethod().name().toUpperCase());
+            return RequestMethod.valueOf(request.getMethod().name().toUpperCase());
         } catch (IllegalArgumentException | NullPointerException e) {
-            return HttpMethod.UNKOWN;
+            return RequestMethod.UNKOWN;
         }
     }
 }

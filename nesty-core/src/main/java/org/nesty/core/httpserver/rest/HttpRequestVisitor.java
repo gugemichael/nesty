@@ -1,6 +1,6 @@
 package org.nesty.core.httpserver.rest;
 
-import org.nesty.commons.constant.http.HttpMethod;
+import org.nesty.commons.constant.http.RequestMethod;
 
 import java.util.Map;
 
@@ -13,7 +13,11 @@ public interface HttpRequestVisitor {
 
     String visitRemoteAddress();
 
-    HttpMethod visitHttpMethod();
+    String visitURL();
+
+    String[] visitTerms();
+
+    RequestMethod visitHttpMethod();
 
     String visitHttpBody();
 

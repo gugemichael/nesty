@@ -1,6 +1,6 @@
 package org.nesty.core.httpserver;
 
-import org.nesty.commons.exception.NestyControllerScanException;
+import org.nesty.commons.exception.ControllerRequestMappingException;
 
 /**
  * nesty
@@ -61,5 +61,5 @@ public interface HttpServer {
      *
      * @param packageName package path name in string format
      */
-    HttpServer scanHttpController(String packageName) throws NestyControllerScanException;
+    HttpServer scanHttpController(String packageName) throws ControllerRequestMappingException;
 }

@@ -2,7 +2,7 @@ package org.nesty.core.httpserver.rest.route;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
-import org.nesty.commons.constant.http.HttpMethod;
+import org.nesty.commons.constant.http.RequestMethod;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,23 +14,23 @@ import java.util.List;
  */
 public class URLResource {
 
-    private static final char VARIABLE = '$';
+    public static final char VARIABLE = '{';
 
     private URLResourceIdentifier identifier;
 
     private URLResource() {
     }
 
-    public static URLResource fromHttp(String url, HttpMethod httpMethod) {
+    public static URLResource fromHttp(String url, RequestMethod requestMethod) {
         URLResource resource = new URLResource();
         resource.identifier = URLResourceIdentifier.analyse(url);
-        resource.identifier.httpMethod = httpMethod;
+        resource.identifier.requestMethod = requestMethod;
         return resource;
     }
 
     @Override
     public String toString() {
-        return String.format("identifier=%s", identifier.toString());
+        return String.format("identifier{%s}", identifier.toString());
     }
 
     @Override
@@ -40,9 +40,7 @@ public class URLResource {
 
     @Override
     public boolean equals(Object other) {
-        if (other == null || !(other instanceof URLResource))
-            return false;
-        return identifier.equals(((URLResource) other).identifier);
+        return !(other == null || !(other instanceof URLResource)) && identifier.equals(((URLResource) other).identifier);
     }
 
     /**
@@ -51,7 +49,7 @@ public class URLResource {
      */
     static class URLResourceIdentifier {
         protected List<String> fragments = new ArrayList<>(32);
-        protected HttpMethod httpMethod;
+        protected RequestMethod requestMethod;
 
         public static URLResourceIdentifier analyse(String url) {
             URLResourceIdentifier identifier = new URLResourceIdentifier();
@@ -65,7 +63,7 @@ public class URLResource {
             if (object == null || !(object instanceof URLResourceIdentifier))
                 return false;
             URLResourceIdentifier other = (URLResourceIdentifier) object;
-            if (httpMethod != other.httpMethod)
+            if (requestMethod != other.requestMethod)
                 return false;
             // rest array is not nessary
             if (fragments.size() != other.fragments.size())
@@ -78,14 +76,27 @@ public class URLResource {
             return true;
         }
 
+        /**
+         * TODO : more URL fileds to hash. inefficient hash searching !
+         *
+         * we calculater hash code without url rest terms array content,
+         * it will same as even rest array is diffrent. this can cause hashcode
+         * is equaled when http method and url terms array size are same.
+         *
+         * HashMap put(K, V) use hashcode() to determine which bucket is
+         * used to hold the Entry. but get() use hashcode() and equals() to search
+         * the Entry. so the correctness has no affected but search performance
+         * on non-exist Entry searching.
+         *
+         */
         @Override
         public int hashCode() {
-            return Joiner.on('.').skipNulls().join(fragments).hashCode() + httpMethod.name().hashCode();
+            return requestMethod.name().hashCode() + fragments.size();
         }
 
         @Override
         public String toString() {
-            return String.format("fragments=%s,httpMethod=%s", Joiner.on("/").skipNulls().join(fragments), httpMethod.name());
+            return String.format("fragments=%s,requestMethod=%s", Joiner.on("/").skipNulls().join(fragments), requestMethod.name());
         }
     }
 }

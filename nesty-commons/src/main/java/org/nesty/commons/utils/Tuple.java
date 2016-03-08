@@ -1,13 +1,14 @@
 package org.nesty.commons.utils;
 
-/**
- * [Author] Michael
- * [Date] March 04, 2016
- */
-public class Tuple <K, V>{
+public class Tuple<K, V> {
 
     public K first;
     public V second;
+
+    public Tuple(K k) {
+        this.first = k;
+        this.second = null;
+    }
 
     public Tuple(K k, V v) {
         this.first = k;

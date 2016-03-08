@@ -5,7 +5,7 @@ import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.util.CharsetUtil;
 import org.nesty.commons.constant.http.HttpConstants;
-import org.nesty.commons.constant.http.HttpMethod;
+import org.nesty.commons.constant.http.RequestMethod;
 import org.nesty.core.httpserver.utils.HttpUtils;
 
 import java.net.InetSocketAddress;
@@ -40,7 +40,7 @@ public class NettyHttpRequestVisitor implements HttpRequestVisitor {
     }
 
     @Override
-    public HttpMethod visitHttpMethod() {
+    public RequestMethod visitHttpMethod() {
         return HttpUtils.convertHttpMethodFromNetty(request);
     }
 
@@ -59,7 +59,7 @@ public class NettyHttpRequestVisitor implements HttpRequestVisitor {
             params.put(item.getKey(), item.getValue().get(0));
 
         // query string and body
-        if (visitHttpMethod() != HttpMethod.GET) {
+        if (visitHttpMethod() != RequestMethod.GET) {
             // from content body key-value
             QueryStringDecoder kvDecoder = new QueryStringDecoder(visitHttpBody(), Charset.forName("UTF-8"), false);
             for (Map.Entry<String, List<String>> item : kvDecoder.parameters().entrySet())
@@ -78,5 +78,15 @@ public class NettyHttpRequestVisitor implements HttpRequestVisitor {
             headers.put(entry.getKey(), entry.getValue());
         }
         return null;
+    }
+
+    @Override
+    public String visitURL() {
+        return request.getUri();
+    }
+
+    @Override
+    public String[] visitTerms() {
+        return request.getUri().split("/");
     }
 }

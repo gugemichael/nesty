@@ -5,5 +5,5 @@ package org.nesty.commons.exception;
  *
  * Author Michael on 03/03/2016.
  */
-public class NestyStartupException extends Exception {
+public class StartupException extends Exception {
 }
