@@ -1,15 +1,13 @@
-package org.nesty.core.httpserver.rest.handler;
+package org.nesty.core.httpserver.rest;
 
 import org.nesty.commons.annotations.Body;
 import org.nesty.commons.annotations.PathVariable;
 import org.nesty.commons.annotations.RequestParam;
 import org.nesty.commons.exception.ControllerParamsNotMatchException;
 import org.nesty.commons.exception.ControllerParamsParsedException;
-import org.nesty.commons.exception.SerialFormatException;
+import org.nesty.commons.exception.SerializeException;
 import org.nesty.commons.utils.SerializeUtils;
-import org.nesty.core.httpserver.rest.URLContext;
-import org.nesty.core.httpserver.rest.handler.ControllerMethodDescriptor.MethodParams.AnnotationType;
-import org.nesty.core.httpserver.rest.route.URLResource;
+import org.nesty.core.httpserver.rest.ControllerMethodDescriptor.MethodParams.AnnotationType;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -116,7 +114,7 @@ public class ControllerMethodDescriptor {
 
             try {
                 paramList[i] = parseParam(params[i].clazz, value, serialize);
-            } catch (NumberFormatException | SerialFormatException e) {
+            } catch (NumberFormatException | SerializeException e) {
                 throw new ControllerParamsParsedException(String.format("parse param exception %s", e.getMessage()));
             }
         }
@@ -124,7 +122,7 @@ public class ControllerMethodDescriptor {
         return paramList;
     }
 
-    private Object parseParam(Class<?> clazz, String value, boolean serialize) throws SerialFormatException {
+    private Object parseParam(Class<?> clazz, String value, boolean serialize) throws SerializeException {
         if (serialize)
             return SerializeUtils.decode(value, clazz);
 

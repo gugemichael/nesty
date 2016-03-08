@@ -1,4 +1,4 @@
-package org.nesty.core.httpserver.rest;
+package org.nesty.core.httpserver.rest.response;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;

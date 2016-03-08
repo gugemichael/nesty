@@ -1,4 +1,4 @@
-package org.nesty.core.httpserver.rest.route;
+package org.nesty.core.httpserver.rest;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;

@@ -1,4 +1,4 @@
-package org.nesty.core.httpserver.rest;
+package org.nesty.core.httpserver.rest.request;
 
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.FullHttpRequest;

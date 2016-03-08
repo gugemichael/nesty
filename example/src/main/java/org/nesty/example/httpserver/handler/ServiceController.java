@@ -18,7 +18,6 @@ public class ServiceController {
     // [GET] http://host:port/projects
     @RequestMapping("/")
     public ServiceResponse getAllProjects() {
-        System.out.println("getAllProjects()");
         return new ServiceResponse();
     }
 

@@ -1,6 +1,7 @@
 package org.nesty.core.httpserver.rest;
 
 import org.nesty.commons.constant.http.RequestMethod;
+import org.nesty.core.httpserver.rest.request.HttpRequestVisitor;
 
 import java.util.Map;
 import java.util.UUID;

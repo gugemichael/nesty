@@ -9,16 +9,14 @@ import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.timeout.ReadTimeoutException;
 import org.nesty.core.httpserver.HttpServer;
-import org.nesty.core.httpserver.rest.HttpResponseBuilder;
-import org.nesty.core.httpserver.rest.NettyHttpRequestVisitor;
 import org.nesty.core.httpserver.rest.URLContext;
-import org.nesty.core.httpserver.rest.handler.BussinessLogicTask;
-import org.nesty.core.httpserver.rest.handler.URLHandler;
+import org.nesty.core.httpserver.rest.URLHandler;
+import org.nesty.core.httpserver.rest.URLResource;
+import org.nesty.core.httpserver.rest.executor.ExecutorTask;
+import org.nesty.core.httpserver.rest.request.NettyHttpRequestVisitor;
+import org.nesty.core.httpserver.rest.response.HttpResponseBuilder;
 import org.nesty.core.httpserver.rest.route.RouteControlloer;
-import org.nesty.core.httpserver.rest.route.URLResource;
 import org.nesty.core.httpserver.utils.HttpUtils;
-
-import java.util.concurrent.Executors;
 
 /**
  * nesty
@@ -38,7 +36,7 @@ public class AsyncRequestRouter extends SimpleChannelInboundHandler<FullHttpRequ
     private static ListeningExecutorService taskWorkerPool;
 
     public static void newTaskPool(int workers) {
-        taskWorkerPool = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(workers));
+        taskWorkerPool = MoreExecutors.listeningDecorator(AsyncExecutors.newExecutors(workers));
     }
 
     public static void newURLResourceController(RouteControlloer routeControllerMap) {
@@ -56,7 +54,7 @@ public class AsyncRequestRouter extends SimpleChannelInboundHandler<FullHttpRequ
         URLHandler handler = null;
         if ((handler = routeController.findURLHandler(resource)) != null) {
             // found url pattern handler
-            BussinessLogicTask task = new BussinessLogicTask(handler, URLContext.build(new NettyHttpRequestVisitor(ctx.channel(), httpRequest)));
+            ExecutorTask task = new ExecutorTask(handler, URLContext.build(new NettyHttpRequestVisitor(ctx.channel(), httpRequest)));
             ListenableFuture<DefaultFullHttpResponse> futureTask = taskWorkerPool.submit(task);
             Futures.addCallback(futureTask, new FutureCallback<DefaultFullHttpResponse>() {
                 @Override

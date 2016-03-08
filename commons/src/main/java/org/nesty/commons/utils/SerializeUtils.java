@@ -3,7 +3,7 @@ package org.nesty.commons.utils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
-import org.nesty.commons.exception.SerialFormatException;
+import org.nesty.commons.exception.SerializeException;
 
 /**
  * [Author] Michael
@@ -17,11 +17,11 @@ public class SerializeUtils {
         return gson.toJson(stuff).getBytes();
     }
 
-    public static Object decode(String stuff, Class<?> clazz) throws SerialFormatException {
+    public static Object decode(String stuff, Class<?> clazz) throws SerializeException {
         try {
             return gson.fromJson(stuff, clazz);
         } catch (JsonSyntaxException e) {
-            throw new SerialFormatException(String.format("%s decode exception", stuff));
+            throw new SerializeException(String.format("%s decode exception", stuff));
         }
     }
 }

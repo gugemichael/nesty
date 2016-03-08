@@ -1,4 +1,4 @@
-package org.nesty.core.httpserver.rest.handler;
+package org.nesty.core.httpserver.rest;
 
 /**
  * controller class

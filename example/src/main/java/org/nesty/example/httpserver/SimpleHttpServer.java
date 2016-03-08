@@ -21,8 +21,8 @@ public class SimpleHttpServer {
         // 2. choose http params
         server.setMaxConnections(4096);
         server.setHandlerTimeout(10000);
-        server.setIoThreads(4);
-        server.setHandlerThreads(128);
+        server.setIoThreads(8);
+        server.setHandlerThreads(256);
         server.scanHttpController("org.nesty.example.httpserver.handler");
 
         // 3. start server and block for servicing

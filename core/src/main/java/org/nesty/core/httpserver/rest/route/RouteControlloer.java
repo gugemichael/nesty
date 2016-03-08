@@ -1,6 +1,7 @@
 package org.nesty.core.httpserver.rest.route;
 
-import org.nesty.core.httpserver.rest.handler.URLHandler;
+import org.nesty.core.httpserver.rest.URLHandler;
+import org.nesty.core.httpserver.rest.URLResource;
 
 import java.util.HashMap;
 import java.util.Map;
