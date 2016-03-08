@@ -102,3 +102,9 @@ public class ServiceController {
 * Netty Bootstrap(io threads) + ThreadPool(logic threads)
 
 ## Performance
+
+Conccurent : 512 http connections 
+Qps : 40,000+
+Latency : < 5ms
+
+detail : https://github.com/gugemichael/nesty/wiki
