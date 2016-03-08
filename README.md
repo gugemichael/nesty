@@ -103,8 +103,9 @@ public class ServiceController {
 
 ## Performance
 
-Conccurent : 512 http connections 
-Qps : 40,000+
-Latency : < 5ms
+* Conccurent : 512 http connections 
+* Qps : 40,000+
+* Latency : < 5ms
 
-detail : https://github.com/gugemichael/nesty/wiki
+detail : https://github.com/gugemichael/nesty/wiki/Performance-Detail
+
