@@ -48,6 +48,8 @@ More examples. Please visit https://github.com/gugemichael/nesty/wiki/More-Examp
 
 ## Performance
 
+java -server -Xmx4G -Xms4G -Xmn1536M -XX:+UseConcMarkSweepGC -XX:+UseParNewGC -XX:PermSize=256m -XX:MaxPermSize=256m -XX:+DisableExplicitGC
+
 * Conccurent : 512 http connections 
 * Qps : 40,000+
 * Latency : < 5ms
