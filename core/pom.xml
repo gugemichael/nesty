@@ -29,9 +29,6 @@
             <artifactId>guava-jdk5</artifactId>
             <version>17.0</version>
         </dependency>
-
-
-
     </dependencies>
 
     <build>

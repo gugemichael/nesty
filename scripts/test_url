@@ -13,5 +13,5 @@ curl $curl_opts -X GET  "http://${host}:${port}/projects/name/myProject" -d "own
 echo ""
 curl $curl_opts -X POST "http://${host}:${port}/projects/" -d "{\"projectId\":1,\"projectName\":\"project1\", \"projectOwner\":\"nesty\"}"
 echo ""
-curl $curl_opts -X UPDATE "http://${host}:${port}/projects/1" -d "{\"projectId\":1,\"projectName\":\"project1\", \"projectOwner\":\"nesty\"}" 
+curl $curl_opts -X PUT "http://${host}:${port}/projects/1" -d "{\"projectId\":1,\"projectName\":\"project1\", \"projectOwner\":\"nesty\"}" 
 echo ""

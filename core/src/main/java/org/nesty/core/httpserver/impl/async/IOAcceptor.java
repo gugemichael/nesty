@@ -60,6 +60,7 @@ public class IOAcceptor {
         // initial request router's work threads
         AsyncRequestRouter.newTaskPool(httpServer.getHandlerThreads());
         AsyncRequestRouter.newURLResourceController(httpServer.getRouteController());
+        AsyncRequestRouter.newInterceptor(httpServer.getInterceptor());
 
         ServerBootstrap socketServer = new ServerBootstrap();
         socketServer.group(bossGroup, workerGroup)
@@ -71,9 +72,8 @@ public class IOAcceptor {
                                 .addLast("nesty-timer", new ReadTimeoutHandler(httpServer.getHandlerTimeout(), TimeUnit.MILLISECONDS))
                                 .addLast("nesty-http-decoder", new HttpRequestDecoder())
                                 .addLast("nesty-http-aggregator", new HttpObjectAggregator(httpServer.getMaxPacketSize()))
-                                .addLast("nesty-request-poster", AsyncRequestRouter.build(httpServer))
+                                .addLast("nesty-request-poster", AsyncRequestRouter.build())
                                 .addLast("nesty-http-encoder", new HttpResponseEncoder());
-                        ;
                     }
                 })
                 .option(ChannelOption.SO_TIMEOUT, httpServer.getHandlerTimeout())
@@ -91,13 +91,5 @@ public class IOAcceptor {
 
         workerGroup.shutdownGracefully();
         bossGroup.shutdownGracefully();
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public int getPort() {
-        return port;
     }
 }

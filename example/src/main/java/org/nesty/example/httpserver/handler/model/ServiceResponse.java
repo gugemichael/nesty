@@ -1,4 +1,4 @@
-package org.nesty.example.httpserver.handler;
+package org.nesty.example.httpserver.handler.model;
 
 public class ServiceResponse {
 

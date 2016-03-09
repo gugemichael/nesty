@@ -2,13 +2,10 @@ package org.nesty.core.httpserver.rest;
 
 import org.nesty.commons.exception.ControllerParamsNotMatchException;
 import org.nesty.commons.exception.ControllerParamsParsedException;
-import org.nesty.commons.utils.SerializeUtils;
-import org.nesty.commons.utils.Tuple;
 import org.nesty.core.httpserver.impl.async.HttpResultStatus;
+import org.nesty.core.httpserver.rest.response.HttpResponse;
 
 import java.lang.reflect.Method;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * nesty
@@ -32,10 +29,7 @@ public class URLHandler {
         return handler;
     }
 
-    public Tuple<HttpResultStatus, byte[]> call(URLContext context) {
-        List<Object> paramsList = new LinkedList<>();
-
-
+    public HttpResponse call(HttpContext context) {
         /**
          * make new controller class instance with every http request. because
          * of we desire every request may has own context variables and status.
@@ -47,13 +41,13 @@ public class URLHandler {
         try {
             Object result = procedure.invoke(provider, context);
             if (!result.getClass().isPrimitive())
-                return new Tuple<HttpResultStatus, byte[]>(HttpResultStatus.SUCCESS, SerializeUtils.encode(result));
+                return new HttpResponse(HttpResultStatus.SUCCESS, result);
             else
-                return new Tuple<HttpResultStatus, byte[]>(HttpResultStatus.RESPONSE_NOT_VALID);
+                return new HttpResponse(HttpResultStatus.RESPONSE_NOT_VALID);
         } catch (ControllerParamsNotMatchException e) {
-            return new Tuple<HttpResultStatus, byte[]>(HttpResultStatus.PARAMS_NOT_MATCHED);
-        } catch(ControllerParamsParsedException e) {
-            return new Tuple<HttpResultStatus, byte[]>(HttpResultStatus.PARAMS_CONVERT_ERROR);
+            return new HttpResponse(HttpResultStatus.PARAMS_NOT_MATCHED);
+        } catch (ControllerParamsParsedException e) {
+            return new HttpResponse(HttpResultStatus.PARAMS_CONVERT_ERROR);
         }
     }
 

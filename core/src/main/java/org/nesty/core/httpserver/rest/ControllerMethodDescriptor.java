@@ -66,7 +66,7 @@ public class ControllerMethodDescriptor {
         }
     }
 
-    public Object invoke(ControllerClassDescriptor clazz, URLContext context) throws ControllerParamsNotMatchException, ControllerParamsParsedException {
+    public Object invoke(ControllerClassDescriptor clazz, HttpContext context) throws ControllerParamsNotMatchException, ControllerParamsParsedException {
         try {
             Object target = clazz.getClazz().newInstance();
             if (params != null)
@@ -85,7 +85,7 @@ public class ControllerMethodDescriptor {
         }
     }
 
-    private Object[] resolveParams(URLContext context) throws ControllerParamsNotMatchException, ControllerParamsParsedException {
+    private Object[] resolveParams(HttpContext context) throws ControllerParamsNotMatchException, ControllerParamsParsedException {
         Object[] paramList = new Object[params.length];
 
         String value = null;
@@ -95,16 +95,16 @@ public class ControllerMethodDescriptor {
             switch (params[i].annotationType) {
             case REQUEST_PARAM:
                 RequestParam reqParam = (RequestParam) params[i].annotation;
-                value = context.httpParams.get(reqParam.value());
+                value = context.getHttpParams().get(reqParam.value());
                 if (value == null && !reqParam.required())
                     continue;
                 break;
             case PATH_VARIABLE:
                 PathVariable pathParam = (PathVariable) params[i].annotation;
-                value = context.terms[params[i].urlPathIndex];
+                value = context.getTerms()[params[i].urlPathIndex];
                 break;
             case BODY:
-                value = context.httpBody;
+                value = context.getHttpBody();
                 serialize = true;
                 break;
             }

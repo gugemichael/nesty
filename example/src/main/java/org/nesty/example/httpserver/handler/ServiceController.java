@@ -3,6 +3,7 @@ package org.nesty.example.httpserver.handler;
 import org.nesty.commons.annotations.*;
 import org.nesty.commons.constant.http.RequestMethod;
 import org.nesty.example.httpserver.handler.model.ProjectModel;
+import org.nesty.example.httpserver.handler.model.ServiceResponse;
 
 @Controller
 @RequestMapping("/projects")
@@ -37,7 +38,7 @@ public class ServiceController {
     }
 
     // [UPDATE] http://host:port/projects/1
-    @RequestMapping(value = "/{projectId}", method = RequestMethod.UPDATE)
+    @RequestMapping(value = "/{projectId}", method = RequestMethod.PUT)
     public ServiceResponse updateProjectNameById(@PathVariable("projectId") Integer projectId,
                                                                         @Body ProjectModel project) {
         System.out.println("updateProjectNameById projectId " + projectId + ". projectName " + project.getProjectName());
