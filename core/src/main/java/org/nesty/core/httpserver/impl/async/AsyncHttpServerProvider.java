@@ -15,7 +15,7 @@ public class AsyncHttpServerProvider extends ScanableHttpServerProvider {
      */
     private final IOAcceptor ioAcceptor;
 
-    public AsyncHttpServerProvider(String address, Integer port) {
+    public AsyncHttpServerProvider(String address, int port) {
         this.ioAcceptor = new IOAcceptor(this, address, port);
     }
 

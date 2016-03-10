@@ -34,6 +34,10 @@ public class ControllerMethodDescriptor {
         Class<?>[] paramsTypes = method.getParameterTypes();
         int total = paramsTypes.length;
         this.params = new MethodParams[total];
+
+
+        // TODO : ugly code here !! messy
+        //
         for (int i = 0; i != total; i++) {
             params[i] = new MethodParams(annotations[i][0], paramsTypes[i]);
             if (params[i].annotation instanceof RequestParam) {

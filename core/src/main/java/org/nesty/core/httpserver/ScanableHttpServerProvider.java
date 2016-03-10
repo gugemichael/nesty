@@ -56,6 +56,16 @@ public abstract class ScanableHttpServerProvider extends HttpServerProvider {
                    throw new ControllerRequestMappingException(String.format("%s must implements %s", clazz.getName(), HttpContextInterceptor.class.getName()));
 
                 try {
+
+                    /**
+                     * we register interceptors with class-name natural sequence. may
+                     * be known as unordered. But make ensurance that call with registered
+                     * sequence.
+                     *
+                     * TODO : may be we can indecate the previous {@link Interceptor} by manul
+                     *            like that @Interceptor(previous = PreInterceptor.class)
+                     *
+                     */
                     inters.add((HttpContextInterceptor) clazz.newInstance());
                     System.err.println(clazz.getName());
                 } catch (InstantiationException | IllegalAccessException e) {
@@ -93,7 +103,15 @@ public abstract class ScanableHttpServerProvider extends HttpServerProvider {
                     URLResource urlResource = URLResource.fromHttp(uri, requestMethod);
                     URLHandler urlHandler = URLHandler.fromProvider(uri, clazz, method);
 
-                    // register
+                    /**
+                     * register the controller to controller map {@link RouteControlloer}. put() will return
+                     * false on dupliacted URLReousource key. Duplicated URLResource means they have same
+                     * url, url variabls and http method. we will confuse on them and couldn't decide which
+                     * controller method to invoke.
+                     *
+                     * TODO : we throw exception here. let users to know and decide what to do
+                     *
+                     */
                     if (!relation.put(urlResource, urlHandler))
                         throw new ControllerRequestMappingException(String.format("%s.%s annotation is duplicated", clazz.getName(), method.getName()));
 

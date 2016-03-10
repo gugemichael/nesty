@@ -55,17 +55,20 @@ public class AsyncRequestRouter extends AsyncRequestReceiver {
 
         /**
          * 1. checking phase. http method, param, url
+         *
          */
         if (!checkup())
             return;
 
         /**
          * 2. according to URL to search the URLHandler
+         *
          */
         URLHandler handler = findURLHandler();
 
         /**
          * 3. execute controller logic to async executor thread pool
+         *
          */
         if (handler != null)
             executeAsyncTask(handler);

@@ -2,7 +2,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <parent>
-        <artifactId>nesty</artifactId>
+        <artifactId>nesty-all</artifactId>
         <groupId>org.nesty</groupId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
@@ -19,16 +19,6 @@
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
 
-        <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-all</artifactId>
-            <version>4.0.9.Final</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava-jdk5</artifactId>
-            <version>17.0</version>
-        </dependency>
     </dependencies>
 
     <build>

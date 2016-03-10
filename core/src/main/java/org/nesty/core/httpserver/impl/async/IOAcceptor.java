@@ -35,23 +35,19 @@ public class IOAcceptor {
     }
 
     public void eventLoop() throws InterruptedException {
-        /**
-         * accept threads indicated the threads only work on accept() syscall,
-         * receive client socket then transfor to io thread pool. bigger pool size
-         * conform in SHORT CONNECTION scene (alse HTTP)
-         *
-         */
+
+        // accept threads indicated the threads only work on accept() syscall,
+        // receive client socket then transfor to io thread pool. bigger pool size
+        // conform in SHORT CONNECTION scene (alse HTTP)
         int acceptThreads = Math.max(2, ((int) (httpServer.getIoThreads() * 0.3) & 0xFFFFFFFE));
 
-        /**
-         * io threads (worker threads) handle client socket's read(), write()
-         * and "business logic flow". in http short connection protocol socket's
-         * read(), write() only a few times.
-         *
-         * HttpAdapter's "business logic flow" has params building, validation,
-         * logging , so we increase this pool percent in MaxThreads
-         *
-         */
+
+        // io threads (worker threads) handle client socket's read(), write()
+        // and "business logic flow". in http short connection protocol socket's
+        // read(), write() only a few times.
+        //
+        // HttpAdapter 's "business logic flow" has params building, validation,
+        // logging , so we increase this pool percent in MaxThreads
         int rwThreads = Math.max(4, ((int) (httpServer.getIoThreads() * 0.7) & 0xFFFFFFFE));
 
         EventLoopGroup bossGroup = new NioEventLoopGroup(acceptThreads);

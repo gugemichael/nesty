@@ -2,7 +2,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <parent>
-        <artifactId>nesty</artifactId>
+        <artifactId>nesty-all</artifactId>
         <groupId>org.nesty</groupId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
@@ -13,11 +13,6 @@
     <version>0.0.1-SNAPSHOT</version>
 
     <dependencies>
-        <dependency>
-            <groupId>com.google.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.2.4</version>
-        </dependency>
 
     </dependencies>
 

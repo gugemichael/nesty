@@ -40,7 +40,7 @@ public class URLHandler {
 
         try {
             Object result = procedure.invoke(provider, context);
-            if (!result.getClass().isPrimitive())
+            if (result != null && !result.getClass().isPrimitive())
                 return new HttpResponse(HttpResultStatus.SUCCESS, result);
             else
                 return new HttpResponse(HttpResultStatus.RESPONSE_NOT_VALID);
