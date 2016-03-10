@@ -1,11 +1,19 @@
 # Nesty
 Http RESTful Api implemention on Netty async io
 
+## Lastest version
+0.1.0
+
 ## Features
 
-* Http HTTP/1.1 protocol. support GET/POST/UPDATE/DELETE
-* Http Restful serialized and formatted(json) in string or Json body (With Gson)
-* Http short connection on async mode by default (With Netty 4.2)
+* Http HTTP/1.1 Protocol support GET/POST/UPDATE/DELETE
+* Http Restful serialized (usually as json) in string body (With Gson)
+* Http Short Connection on async mode by default (With Netty 4.2)
+
+## TODO
+* Long connection support (require explict Connection: Keep-Alive header set)
+* Spring or Mybatis intergrated
+
 
 ## Usage
 
