@@ -91,11 +91,12 @@ public abstract class ScanableHttpServerProvider extends HttpServerProvider {
                         continue;
 
                     String uri = requestMapping.value();
+                    if (!uri.startsWith("/"))
+                        throw new ControllerRequestMappingException(String.format("%s.%s annotation must start with / ", clazz.getName(), method.getName()));
+
                     if (clazzLevelRequestMapping != null)
                         uri = clazzLevelRequestMapping.value() + uri;
 
-                    if (!uri.startsWith("/"))
-                        throw new ControllerRequestMappingException(String.format("%s.%s annotation must start with / ", clazz.getName(), method.getName()));
 
                     // default is RequestMethod.GET if method annotation is not set
                     RequestMethod requestMethod = requestMapping.method();

@@ -1,6 +1,7 @@
 package org.nesty.core.httpserver.rest;
 
 import org.nesty.commons.annotations.Body;
+import org.nesty.commons.annotations.Header;
 import org.nesty.commons.annotations.PathVariable;
 import org.nesty.commons.annotations.RequestParam;
 import org.nesty.commons.exception.ControllerParamsNotMatchException;
@@ -40,8 +41,12 @@ public class ControllerMethodDescriptor {
         //
         for (int i = 0; i != total; i++) {
             params[i] = new MethodParams(annotations[i][0], paramsTypes[i]);
-            if (params[i].annotation instanceof RequestParam) {
+            if (params[i].annotation instanceof Header) {
+                params[i].annotationType = AnnotationType.HEADER;
+            } else if (params[i].annotation instanceof RequestParam) {
                 params[i].annotationType = AnnotationType.REQUEST_PARAM;
+            } else if (params[i].annotation instanceof Body) {
+                params[i].annotationType = AnnotationType.BODY;
             } else if (params[i].annotation instanceof PathVariable) {
                 params[i].annotationType = AnnotationType.PATH_VARIABLE;
                 String name = ((PathVariable) params[i].annotation).value();
@@ -51,18 +56,15 @@ public class ControllerMethodDescriptor {
                 for (String path : pathVariable) {
                     if (path == null || path.isEmpty())
                         continue;
-                    index++;
                     if (path.charAt(0) == URLResource.VARIABLE && path.length() > 2) {
                         String varName = path.substring(1, path.length() - 1);
-                        if (varName.equals(name)) {
+                        if (varName.equals(name))
                             params[i].urlPathIndex = index;
-                        }
                     }
+                    index++;
                 }
                 if (params[i].urlPathIndex == -1)
                     throw new IllegalArgumentException(String.format("%s[%s] is not found around %s()", PathVariable.class.getSimpleName(), name, method.getName()));
-            } else if (params[i].annotation instanceof Body) {
-                params[i].annotationType = AnnotationType.BODY;
             } else {
                 // TODO : throw runtime Exception ?
                 throw new IllegalArgumentException("unknown annotation " + params[i].annotation.annotationType().getName());
@@ -96,16 +98,26 @@ public class ControllerMethodDescriptor {
         boolean serialize = false;
         // iterate whole method params
         for (int i = 0; i != paramList.length; i++) {
+            boolean required = true;
             switch (params[i].annotationType) {
             case REQUEST_PARAM:
                 RequestParam reqParam = (RequestParam) params[i].annotation;
                 value = context.getHttpParams().get(reqParam.value());
+                // only if required is fase
                 if (value == null && !reqParam.required())
-                    continue;
+                    required = false;
                 break;
             case PATH_VARIABLE:
                 PathVariable pathParam = (PathVariable) params[i].annotation;
-                value = context.getTerms()[params[i].urlPathIndex];
+                if (params[i].urlPathIndex < context.getTerms().length)
+                    value = context.getTerms()[params[i].urlPathIndex];
+                break;
+            case HEADER:
+                Header header = (Header) params[i].annotation;
+                value = context.getHttpHeaders().get(header.value());
+                // only if required is fase
+                if (value == null && !header.required())
+                    required = false;
                 break;
             case BODY:
                 value = context.getHttpBody();
@@ -113,7 +125,7 @@ public class ControllerMethodDescriptor {
                 break;
             }
 
-            if (value == null)
+            if (value == null && required)
                 throw new ControllerParamsNotMatchException(String.format("resolve %s failed", params[i].annotation.annotationType().getName()));
 
             try {
@@ -127,22 +139,42 @@ public class ControllerMethodDescriptor {
     }
 
     private Object parseParam(Class<?> clazz, String value, boolean serialize) throws SerializeException {
-        if (serialize)
-            return SerializeUtils.decode(value, clazz);
+        // need body serialize parsed
+        if (serialize) {
+            return value != null ? SerializeUtils.decode(value, clazz) : null;
+        }
 
+        // enum
+        if (clazz.isEnum()) {
+            // traversal all enum constants. UNNECESSARY test value is null
+            for (Object member : clazz.getEnumConstants())
+                if (member.toString().equalsIgnoreCase(value))
+                    return member;
+            return null;
+        }
+
+        // default value
+        //      String          null
+        //      int/short/long  0
+        //      float/double    0
+        //      boolean         false
+        //      Integer/Long/Short null
+        //      Boolean         null
+        //
         if (clazz == String.class) {
             return value;
         } else if (clazz == int.class || clazz == Integer.class) {
-            return Integer.parseInt(value);
+            return value != null ? Integer.parseInt(value) : 0;
         } else if (clazz == short.class || clazz == Short.class) {
-            return Short.parseShort(value);
-        } else if (clazz == float.class || clazz == Float.class) {
-            return Float.parseFloat(value);
+            return value != null ? Short.parseShort(value) : (short) 0;
         } else if (clazz == long.class || clazz == Long.class) {
-            return Long.parseLong(value);
+            return value != null ? Long.parseLong(value) : 0L;
+        } else if (clazz == float.class || clazz == Float.class) {
+            return value != null ? Float.parseFloat(value) : 0.0f;
         } else if (clazz == double.class || clazz == Double.class) {
-            return Short.parseShort(value);
+            return value != null ? Double.parseDouble(value) : 0.0d;
         } else if (clazz == boolean.class || clazz == Boolean.class) {
+            // without test null
             return Boolean.parseBoolean(value);
         }
 
@@ -170,7 +202,7 @@ public class ControllerMethodDescriptor {
         }
 
         enum AnnotationType {
-            REQUEST_PARAM, PATH_VARIABLE, BODY
+            REQUEST_PARAM, PATH_VARIABLE, BODY, HEADER
         }
     }
 }

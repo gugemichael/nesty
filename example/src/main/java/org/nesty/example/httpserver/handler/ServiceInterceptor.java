@@ -10,7 +10,7 @@ public class ServiceInterceptor extends HttpContextInterceptor {
 
     @Override
     public boolean recvRequest(final HttpContext context) {
-        System.out.println(context.getRemoteAddress());
+//        System.out.println(context.getRemoteAddress());
         return true;
     }
 

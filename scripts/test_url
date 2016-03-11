@@ -5,13 +5,11 @@ port=8080
 
 curl_opts=--silent 
 
-curl $curl_opts -X GET "http://${host}:${port}/projects/"
-echo ""
-curl $curl_opts -X GET "http://${host}:${port}/projects/1"
-echo ""
-curl $curl_opts -X GET  "http://${host}:${port}/projects/name/myProject" -d "owner=me"
-echo ""
-curl $curl_opts -X POST "http://${host}:${port}/projects/" -d "{\"projectId\":1,\"projectName\":\"project1\", \"projectOwner\":\"nesty\"}"
-echo ""
-curl $curl_opts -X PUT "http://${host}:${port}/projects/1" -d "{\"projectId\":1,\"projectName\":\"project1\", \"projectOwner\":\"nesty\"}" 
-echo ""
+curl $curl_opts -X GET "http://${host}:${port}/projects/" ; echo ""
+curl $curl_opts -X GET "http://${host}:${port}/projects/" -H "Content-Type: application/text"; echo ""
+curl $curl_opts -X GET "http://${host}:${port}/projects/type/a" ; echo ""
+curl $curl_opts -X GET "http://${host}:${port}/projects/1" ; echo ""
+curl $curl_opts -X GET  "http://${host}:${port}/projects/name/myProject" -d "owner=me" ; echo ""
+curl $curl_opts -X GET  "http://${host}:${port}/projects/name/myProject/property/xxxxx" -d "owner=me" ; echo ""
+curl $curl_opts -X POST "http://${host}:${port}/projects/" -d "{\"projectId\":1,\"projectName\":\"project1\", \"projectOwner\":\"nesty\"}" ; echo ""
+curl $curl_opts -X PUT "http://${host}:${port}/projects/1?projectName=ss" -d "{\"projectId\":1,\"projectName\":\"project1\", \"projectOwner\":\"nesty\"}" ; echo ""

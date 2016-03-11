@@ -1,5 +1,7 @@
 package org.nesty.core.httpserver.rest.request;
 
+import com.google.common.base.Splitter;
+import com.google.common.collect.FluentIterable;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.QueryStringDecoder;
@@ -77,7 +79,7 @@ public class NettyHttpRequestVisitor implements HttpRequestVisitor {
             Map.Entry<String, String> entry = itr.next();
             headers.put(entry.getKey(), entry.getValue());
         }
-        return null;
+        return headers;
     }
 
     @Override
@@ -87,6 +89,12 @@ public class NettyHttpRequestVisitor implements HttpRequestVisitor {
 
     @Override
     public String[] visitTerms() {
-        return request.getUri().split("/");
+        String termsUrl;
+        if (request.getUri().contains("?"))
+            termsUrl = request.getUri().substring(0, request.getUri().indexOf('?'));
+        else
+            termsUrl = request.getUri();
+
+        return FluentIterable.from(Splitter.on('/').omitEmptyStrings().trimResults().split(termsUrl)).toArray(String.class);
     }
 }

@@ -45,8 +45,10 @@ public class URLHandler {
             else
                 return new HttpResponse(HttpResultStatus.RESPONSE_NOT_VALID);
         } catch (ControllerParamsNotMatchException e) {
+            e.printStackTrace();
             return new HttpResponse(HttpResultStatus.PARAMS_NOT_MATCHED);
         } catch (ControllerParamsParsedException e) {
+            e.printStackTrace();
             return new HttpResponse(HttpResultStatus.PARAMS_CONVERT_ERROR);
         }
     }
