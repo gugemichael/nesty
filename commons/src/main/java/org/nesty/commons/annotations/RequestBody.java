@@ -7,6 +7,6 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.PARAMETER, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Body {
+public @interface RequestBody {
     boolean required() default true;
 }

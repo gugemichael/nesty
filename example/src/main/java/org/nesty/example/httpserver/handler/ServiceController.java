@@ -12,7 +12,7 @@ public class ServiceController {
 
     // [POST] http://host:port/projects/1
     @RequestMapping(value = "/", method = RequestMethod.POST)
-    public ServiceResponse createProject(@RequestParam(value = "not-exist", required = false) int nouse, @Body ProjectModel project) {
+    public ServiceResponse createProject(@RequestParam(value = "not-exist", required = false) int nouse, @RequestBody ProjectModel project) {
         System.out.println("createProject() projectName " + project.getProjectName() + " nouse " + nouse);
         return new ServiceResponse();
     }
@@ -57,7 +57,7 @@ public class ServiceController {
     // [PUT] http://host:port/projects/1
     @RequestMapping(value = "/{projectId}", method = RequestMethod.PUT)
     public ServiceResponse updateProjectNameById(@PathVariable("projectId") Integer projectId, @RequestParam("projectName") String projectName,
-                                                                        @Body ProjectModel project) {
+                                                                        @RequestBody ProjectModel project) {
         System.out.println("updateProjectNameById projectId " + projectId + ". projectName " + project.getProjectName());
         return new ServiceResponse();
     }

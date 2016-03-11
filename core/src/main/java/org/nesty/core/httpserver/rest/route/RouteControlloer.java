@@ -14,13 +14,9 @@ import java.util.Map;
  */
 public class RouteControlloer {
 
-    /**
-     * Restful mapping
-     */
-    private final ConcurrentReadRouteMap controller;
+    private final Map<URLResource, URLHandler> controller = new HashMap<>(256);
 
-    public RouteControlloer(ConcurrentReadRouteMap controllerMap) {
-        this.controller = controllerMap;
+    public RouteControlloer() {
     }
 
     /**
@@ -33,16 +29,7 @@ public class RouteControlloer {
         return controller.get(resource);
     }
 
-    public static class ConcurrentReadRouteMap {
-        private Map<URLResource, URLHandler> map = new HashMap<>(128);
-
-        public synchronized boolean put(URLResource resource, URLHandler handler) {
-            return this.map.put(resource, handler) == null;
-        }
-
-        public URLHandler get(URLResource resource) {
-            return this.map.get(resource);
-        }
-
+    public synchronized boolean put(URLResource resource, URLHandler handler) {
+        return controller.put(resource, handler) == null;
     }
 }

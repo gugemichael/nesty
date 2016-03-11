@@ -24,9 +24,9 @@ import java.util.List;
  */
 public abstract class ScanableHttpServerProvider extends HttpServerProvider {
 
-    private RouteControlloer routeControlloer;
+    private static final RouteControlloer routeControlloer = new RouteControlloer();
 
-    private List<HttpContextInterceptor> interceptor;
+    private static final List<HttpContextInterceptor> interceptor = new LinkedList<>();
 
     /**
      * scan specified package's all classes
@@ -35,9 +35,6 @@ public abstract class ScanableHttpServerProvider extends HttpServerProvider {
 
     @Override
     public HttpServer scanHttpController(String packageName) throws ControllerRequestMappingException {
-        RouteControlloer.ConcurrentReadRouteMap relation = new RouteControlloer.ConcurrentReadRouteMap();
-        List<HttpContextInterceptor> inters = new LinkedList<>();
-
         // find all Class
         List<Class<?>> classList = null;
         try {
@@ -66,7 +63,7 @@ public abstract class ScanableHttpServerProvider extends HttpServerProvider {
                      *            like that @Interceptor(previous = PreInterceptor.class)
                      *
                      */
-                    inters.add((HttpContextInterceptor) clazz.newInstance());
+                    interceptor.add((HttpContextInterceptor) clazz.newInstance());
                     System.err.println(clazz.getName());
                 } catch (InstantiationException | IllegalAccessException e) {
                     throw new ControllerRequestMappingException(String.format("%s newInstance() failed %s", clazz.getName(), e.getMessage()));
@@ -113,16 +110,13 @@ public abstract class ScanableHttpServerProvider extends HttpServerProvider {
                      * TODO : we throw exception here. let users to know and decide what to do
                      *
                      */
-                    if (!relation.put(urlResource, urlHandler))
+                    if (!routeControlloer.put(urlResource, urlHandler))
                         throw new ControllerRequestMappingException(String.format("%s.%s annotation is duplicated", clazz.getName(), method.getName()));
 
                     System.err.println(urlHandler.toString());
                 }
             }
         }
-
-        routeControlloer = new RouteControlloer(relation);
-        interceptor = inters;
 
         return this;
     }

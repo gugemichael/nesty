@@ -7,52 +7,50 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * nesty
+ * http context. include all http request and response information
  *
  * Author Michael on 03/03/2016.
  */
-public class HttpContext {
+public class HttpContext extends HttpSession {
 
-    /**
-     * client request with unique id, fetch it from http header(Request-Id)
-     * if exsit. or generate by UUID
-     */
+    // raw body
+    protected String httpBody;
+    // params include query string and body param
+    protected Map<String, String> httpParams;
+    // attribute map values
+    protected Map<String, Object> httpAttributes;
+    // header values
+    protected Map<String, String> httpHeaders;
+    // client request with unique id, fetch it from http header(Request-Id)
+    // if exsit. or generate by UUID
     private String requestId = UUID.randomUUID().toString();
-
-    /**
-     * ip address from origin client, fetch it from getRemoteAddr()
-     * or header X-FORWARDED-FOR
-     */
+    // ip address from origin client, fetch it from getRemoteAddr()
+    // or header X-FORWARDED-FOR
     private String remoteAddress;
-
-    /**
-     * whole http url exclude query string
-     *
-     */
+    //  raw url exclude query string
     private String url;
-
-    /**
-     * http url terms split by "/"
-     *
-     */
+    // http uri terms split by "/"
     private String[] terms;
-
-    /**
-     * Http request method. can't be null
-     */
+    // Http request method. NOT null
     private RequestMethod requestMethod;
 
-    private String httpBody;
+    protected HttpContext() {
+    }
 
-    private Map<String, String> httpParams;
+    public static HttpContext build(HttpRequestVisitor visitor) {
+        HttpContext context = new HttpContext();
+        context.remoteAddress = visitor.visitRemoteAddress();
+        context.url = visitor.visitURL();
+        context.terms = visitor.visitTerms();
+        context.requestMethod = visitor.visitHttpMethod();
+        context.httpHeaders = visitor.visitHttpHeaders();
+        context.httpParams = visitor.visitHttpParams();
 
-    /**
-     * Header values
-     */
-    private Map<String, String> httpHeaders;
+        // TODO : if exclude GET or not ?
+        //
+        context.httpBody = visitor.visitHttpBody();
 
-    public String getRequestId() {
-        return requestId;
+        return context;
     }
 
     public String getRemoteAddress() {
@@ -75,6 +73,7 @@ public class HttpContext {
         return httpBody;
     }
 
+    @Override
     public Map<String, String> getHttpParams() {
         return httpParams;
     }
@@ -83,24 +82,23 @@ public class HttpContext {
         return httpHeaders;
     }
 
-    private HttpContext() {
-
+    @Override
+    public String getRequestId() {
+        return requestId;
     }
 
-    public static HttpContext build(HttpRequestVisitor visitor) {
-        HttpContext context = new HttpContext();
-        context.remoteAddress = visitor.visitRemoteAddress();
-        context.url = visitor.visitURL();
-        context.terms = visitor.visitTerms();
-        context.requestMethod = visitor.visitHttpMethod();
-        context.httpHeaders = visitor.visitHttpHeaders();
-        context.httpParams = visitor.visitHttpParams();
-
-        if (context.requestMethod != RequestMethod.GET)
-            context.httpBody = visitor.visitHttpBody();
-
-        return context;
+    @Override
+    public Map<String, Object> getHttpAttributes() {
+        return httpAttributes;
     }
-
-
 }
+
+
+
+
+
+
+
+
+
+

@@ -4,13 +4,6 @@ import org.nesty.commons.exception.ControllerRequestMappingException;
 import org.nesty.core.httpserver.HttpServer;
 import org.nesty.core.httpserver.impl.async.AsyncHttpServerProvider;
 
-/**
- * Easy simple http server
- *
- * [Author] Michael
- * [Date] March 4, 2016
- *
- */
 public class SimpleHttpServer {
 
     public static void main(String[] args) throws ControllerRequestMappingException {
@@ -23,7 +16,8 @@ public class SimpleHttpServer {
         server.setHandlerTimeout(10000);
         server.setIoThreads(8);
         server.setHandlerThreads(256);
-        server.scanHttpController("org.nesty.example.httpserver.handler");
+        server.scanHttpController("com.nesty.test.neptune")
+                .scanHttpController("org.nesty.example.httpserver.handler");
 
         // 3. start server and block for servicing
         if (!server.start()) {

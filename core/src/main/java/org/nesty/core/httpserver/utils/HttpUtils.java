@@ -17,4 +17,10 @@ public class HttpUtils {
             return RequestMethod.UNKOWN;
         }
     }
+
+    public static String truncateUrl(String url) {
+        if (url.contains("?"))
+            url = url.substring(0, url.indexOf("?"));
+        return url;
+    }
 }

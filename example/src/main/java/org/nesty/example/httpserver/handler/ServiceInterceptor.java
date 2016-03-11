@@ -16,7 +16,7 @@ public class ServiceInterceptor extends HttpContextInterceptor {
 
     @Override
     public HttpResponse sendResponse(final HttpContext context, final HttpResponse response) {
-        System.out.println(response.getHttpStatus());
+//        System.out.println(response.getHttpStatus());
         return response;
     }
 }

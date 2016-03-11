@@ -1,6 +1,6 @@
 package org.nesty.core.httpserver.rest;
 
-import org.nesty.commons.annotations.Body;
+import org.nesty.commons.annotations.RequestBody;
 import org.nesty.commons.annotations.Header;
 import org.nesty.commons.annotations.PathVariable;
 import org.nesty.commons.annotations.RequestParam;
@@ -34,40 +34,48 @@ public class ControllerMethodDescriptor {
         Annotation[][] annotations = method.getParameterAnnotations();
         Class<?>[] paramsTypes = method.getParameterTypes();
         int total = paramsTypes.length;
-        this.params = new MethodParams[total];
 
+//        if (annotations.length != paramsTypes.length || annotations.length + 1 != paramsTypes.length)
+//            throw new IllegalArgumentException(String.format("%s parameters annotation invalid", method.getName()));
+
+        this.params = new MethodParams[total];
 
         // TODO : ugly code here !! messy
         //
         for (int i = 0; i != total; i++) {
-            params[i] = new MethodParams(annotations[i][0], paramsTypes[i]);
-            if (params[i].annotation instanceof Header) {
-                params[i].annotationType = AnnotationType.HEADER;
-            } else if (params[i].annotation instanceof RequestParam) {
-                params[i].annotationType = AnnotationType.REQUEST_PARAM;
-            } else if (params[i].annotation instanceof Body) {
-                params[i].annotationType = AnnotationType.BODY;
-            } else if (params[i].annotation instanceof PathVariable) {
-                params[i].annotationType = AnnotationType.PATH_VARIABLE;
-                String name = ((PathVariable) params[i].annotation).value();
-                // findout the index of correspond variable
-                String[] pathVariable = URI.split("/");
-                int index = 0;
-                for (String path : pathVariable) {
-                    if (path == null || path.isEmpty())
-                        continue;
-                    if (path.charAt(0) == URLResource.VARIABLE && path.length() > 2) {
-                        String varName = path.substring(1, path.length() - 1);
-                        if (varName.equals(name))
-                            params[i].urlPathIndex = index;
-                    }
-                    index++;
-                }
-                if (params[i].urlPathIndex == -1)
-                    throw new IllegalArgumentException(String.format("%s[%s] is not found around %s()", PathVariable.class.getSimpleName(), name, method.getName()));
+            if (paramsTypes[i] == HttpSession.class) {
+                params[i] = new MethodParams(null, HttpSession.class);
+                params[i].annotationType = AnnotationType.HTTP_SESSION;
             } else {
-                // TODO : throw runtime Exception ?
-                throw new IllegalArgumentException("unknown annotation " + params[i].annotation.annotationType().getName());
+                params[i] = new MethodParams(annotations[i][0], paramsTypes[i]);
+                if (params[i].annotation instanceof Header) {
+                    params[i].annotationType = AnnotationType.HEADER;
+                } else if (params[i].annotation instanceof RequestParam) {
+                    params[i].annotationType = AnnotationType.REQUEST_PARAM;
+                } else if (params[i].annotation instanceof RequestBody) {
+                    params[i].annotationType = AnnotationType.REQUEST_BODY;
+                } else if (params[i].annotation instanceof PathVariable) {
+                    params[i].annotationType = AnnotationType.PATH_VARIABLE;
+                    String name = ((PathVariable) params[i].annotation).value();
+                    // findout the index of correspond variable
+                    String[] pathVariable = URI.split("/");
+                    int index = 0;
+                    for (String path : pathVariable) {
+                        if (path == null || path.isEmpty())
+                            continue;
+                        if (path.charAt(0) == URLResource.VARIABLE && path.length() > 2) {
+                            String varName = path.substring(1, path.length() - 1);
+                            if (varName.equals(name))
+                                params[i].urlPathIndex = index;
+                        }
+                        index++;
+                    }
+                    if (params[i].urlPathIndex == -1)
+                        throw new IllegalArgumentException(String.format("%s[%s] is not found around %s()", PathVariable.class.getSimpleName(), name, method.getName()));
+                } else {
+                    // TODO : throw runtime Exception ?
+                    throw new IllegalArgumentException("unknown annotation " + params[i].annotation.annotationType().getName());
+                }
             }
         }
     }
@@ -87,7 +95,10 @@ public class ControllerMethodDescriptor {
              */
             e.printStackTrace();
 
-            throw new ControllerParamsNotMatchException(String.format("invoke %s.%s throw exception %s", clazz.getClass().getName(), method.getName(), e.getMessage()));
+            if (e instanceof InvocationTargetException)
+                throw new RuntimeException(e.getMessage());
+            else
+                throw new ControllerParamsNotMatchException(String.format("invoke %s.%s throw exception %s", clazz.getClass().getName(), method.getName(), e.getMessage()));
         }
     }
 
@@ -95,22 +106,15 @@ public class ControllerMethodDescriptor {
         Object[] paramList = new Object[params.length];
 
         String value = null;
-        boolean serialize = false;
         // iterate whole method params
         for (int i = 0; i != paramList.length; i++) {
+//            System.err.println(i + " | " + params[i].annotationType);
             boolean required = true;
+            boolean auto = false;
+            boolean serialize = false;
             switch (params[i].annotationType) {
-            case REQUEST_PARAM:
-                RequestParam reqParam = (RequestParam) params[i].annotation;
-                value = context.getHttpParams().get(reqParam.value());
-                // only if required is fase
-                if (value == null && !reqParam.required())
-                    required = false;
-                break;
-            case PATH_VARIABLE:
-                PathVariable pathParam = (PathVariable) params[i].annotation;
-                if (params[i].urlPathIndex < context.getTerms().length)
-                    value = context.getTerms()[params[i].urlPathIndex];
+            case HTTP_SESSION:
+                auto = true;
                 break;
             case HEADER:
                 Header header = (Header) params[i].annotation;
@@ -119,17 +123,29 @@ public class ControllerMethodDescriptor {
                 if (value == null && !header.required())
                     required = false;
                 break;
-            case BODY:
+            case REQUEST_PARAM:
+                RequestParam reqParam = (RequestParam) params[i].annotation;
+                value = context.getHttpParams().get(reqParam.value());
+                // only if required is fase
+                if (value == null && !reqParam.required())
+                    required = false;
+                break;
+            case REQUEST_BODY:
                 value = context.getHttpBody();
                 serialize = true;
                 break;
+            case PATH_VARIABLE:
+                PathVariable pathParam = (PathVariable) params[i].annotation;
+                if (params[i].urlPathIndex < context.getTerms().length)
+                    value = context.getTerms()[params[i].urlPathIndex];
+                break;
             }
 
-            if (value == null && required)
+            if ((value == null || value.isEmpty()) && required && !auto)
                 throw new ControllerParamsNotMatchException(String.format("resolve %s failed", params[i].annotation.annotationType().getName()));
 
             try {
-                paramList[i] = parseParam(params[i].clazz, value, serialize);
+                paramList[i] = parseParam(params[i].clazz, value, serialize, context);
             } catch (NumberFormatException | SerializeException e) {
                 throw new ControllerParamsParsedException(String.format("parse param exception %s", e.getMessage()));
             }
@@ -138,7 +154,7 @@ public class ControllerMethodDescriptor {
         return paramList;
     }
 
-    private Object parseParam(Class<?> clazz, String value, boolean serialize) throws SerializeException {
+    private Object parseParam(Class<?> clazz, String value, boolean serialize, HttpContext context) throws SerializeException {
         // need body serialize parsed
         if (serialize) {
             return value != null ? SerializeUtils.decode(value, clazz) : null;
@@ -153,14 +169,19 @@ public class ControllerMethodDescriptor {
             return null;
         }
 
+        // HttpSession inject
+        if (clazz == HttpSession.class) {
+            // HttpSession is the super class of HttpContext
+            return context;
+        }
+
         // default value
-        //      String          null
-        //      int/short/long  0
-        //      float/double    0
-        //      boolean         false
-        //      Integer/Long/Short null
-        //      Boolean         null
-        //
+        // String ..................... null
+        // int/short/long ........... 0
+        // float/double ............. 0
+        // boolean ................... false
+        // Integer/Long/Short .... null
+        // Boolean ................... null
         if (clazz == String.class) {
             return value;
         } else if (clazz == int.class || clazz == Integer.class) {
@@ -178,7 +199,7 @@ public class ControllerMethodDescriptor {
             return Boolean.parseBoolean(value);
         }
 
-        return value;
+        return null;
     }
 
     public Method getMethod() {
@@ -202,7 +223,7 @@ public class ControllerMethodDescriptor {
         }
 
         enum AnnotationType {
-            REQUEST_PARAM, PATH_VARIABLE, BODY, HEADER
+            REQUEST_PARAM, REQUEST_BODY, PATH_VARIABLE, HEADER, HTTP_SESSION
         }
     }
 }

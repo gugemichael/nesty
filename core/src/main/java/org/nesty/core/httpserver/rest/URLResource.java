@@ -3,6 +3,7 @@ package org.nesty.core.httpserver.rest;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import org.nesty.commons.constant.http.RequestMethod;
+import org.nesty.core.httpserver.utils.HttpUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,6 +53,7 @@ public class URLResource {
         protected RequestMethod requestMethod;
 
         public static URLResourceIdentifier analyse(String url) {
+            url = HttpUtils.truncateUrl(url);
             URLResourceIdentifier identifier = new URLResourceIdentifier();
             for (String s : Splitter.on('/').trimResults().omitEmptyStrings().split(url))
                 identifier.fragments.add(s);

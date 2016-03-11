@@ -13,7 +13,6 @@ import org.nesty.core.httpserver.utils.HttpUtils;
 import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -74,11 +73,8 @@ public class NettyHttpRequestVisitor implements HttpRequestVisitor {
     @Override
     public Map<String, String> visitHttpHeaders() {
         Map<String, String> headers = new HashMap<>(32);
-        Iterator<Map.Entry<String, String>> itr = request.headers().iterator();
-        while (itr.hasNext()) {
-            Map.Entry<String, String> entry = itr.next();
+        for (Map.Entry<String, String> entry : request.headers())
             headers.put(entry.getKey(), entry.getValue());
-        }
         return headers;
     }
 
@@ -89,12 +85,7 @@ public class NettyHttpRequestVisitor implements HttpRequestVisitor {
 
     @Override
     public String[] visitTerms() {
-        String termsUrl;
-        if (request.getUri().contains("?"))
-            termsUrl = request.getUri().substring(0, request.getUri().indexOf('?'));
-        else
-            termsUrl = request.getUri();
-
+        String termsUrl = HttpUtils.truncateUrl(request.getUri());
         return FluentIterable.from(Splitter.on('/').omitEmptyStrings().trimResults().split(termsUrl)).toArray(String.class);
     }
 }
