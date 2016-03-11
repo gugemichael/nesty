@@ -4,11 +4,36 @@ Http RESTful Api implemention on Netty async io
 ## Lastest version
 0.1.0
 
+changeslog 
+0.1.0 
+
 ## Features
 
-* Http HTTP/1.1 Protocol support GET/POST/UPDATE/DELETE
+* Http HTTP/1.1 protocol support 
+
+GET | POST | UPDATE | DELETE
+--- | --- | --- | ---
+
 * Http Restful serialized (usually as json) in string body (With Gson)
 * Http Short Connection on async mode by default (With Netty 4.2)
+* Http request mapping variable support
+
+Annotation | From 
+--- | --- 
+@Header | http header 
+@RequestParam | http url query string or http body key value pairs 
+@PathVariabl | http uri path vairable with {path} 
+@Body | http body 
+
+* Http request mapping method params type support
+
+Class Type | Default value (require = false is set) | Description
+--- | --- | --- 
+int,short,long | 0 | primitive
+float,double | 0.0d | primitive
+String | null | string value
+Enum | null | enum class type
+Class | null | from http body serializer parsed
 
 ## TODO
 * Long connection support (require explict Connection: Keep-Alive header set)
