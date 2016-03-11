@@ -1,13 +1,13 @@
 # Nesty
 Http RESTful Api implemention on Netty async io
 
-## 1. Lastest version
+## Lastest version
 0.1.0
 
 changeslog 
 0.1.0 
 
-## 2. Features
+## Features
 
 * Http HTTP/1.1 protocol support 
 
@@ -35,12 +35,12 @@ String | null | string value
 Enum | null | enum class type
 Class | null | from http body serializer parsed
 
-## 3. TODO
+## TODO
 * Long connection support (require explict Connection: Keep-Alive header set)
 * Spring or Mybatis intergrated
 
 
-## 4. Usage
+## Usage
 
 * Simplest http server
 
@@ -75,11 +75,11 @@ public class ServiceController {
 
 More examples. Please visit https://github.com/gugemichael/nesty/wiki/More-Examples
 
-## 5. Threads Model
+## Threads Model
 
 * Netty Bootstrap(io threads) + ThreadPool(logic threads)
 
-## 6. Performance
+## Performance
 
 java -server -Xmx4G -Xms4G -Xmn1536M -XX:+UseConcMarkSweepGC -XX:+UseParNewGC -XX:PermSize=256m -XX:MaxPermSize=256m -XX:+DisableExplicitGC
 
