@@ -17,6 +17,7 @@ public class SimpleHttpServer {
         server.setIoThreads(8);
         server.setHandlerThreads(256);
         server.scanHttpController("com.nesty.test.neptune")
+                .scanHttpController("com.nesty.test.billing")
                 .scanHttpController("org.nesty.example.httpserver.handler");
 
         // 3. start server and block for servicing

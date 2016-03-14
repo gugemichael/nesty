@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+prefix=127.0.0.1:8080/
+
+curl_opts=--silent
+
+curl $curl_opts -X POST "http://${prefix}/rds/bind?tenantId=1&instanceId=12345&projectId=2" ; echo ""
+curl $curl_opts -X POST "http://${prefix}/rds/unbind?tenantId=1&instanceId=12345" ; echo ""
+curl $curl_opts -X GET "http://${prefix}/rds/project?tenantId=1&instanceId=1" ; echo ""
+curl $curl_opts -X POST "http://${prefix}/contract/new?tenantId=1&resourceType=12345&specs=sss&baseId=3&specs=sss" ; echo ""
+curl $curl_opts -X POST "http://${prefix}/contract/renew?tenantId=1&resourceId=12345&baseId=3&specs=sss" ; echo ""
+curl $curl_opts -X POST "http://${prefix}/contract/upgrade?tenantId=1&resourceId=12345&baseId=3&specs=sss" ; echo ""
+curl $curl_opts -X DELETE "http://${prefix}/contract/1/2?tenantId=1&baseId=3&contractId=123" ; echo ""
+curl $curl_opts -X GET "http://${prefix}/contract/1/2?" ; echo ""
+curl $curl_opts -X GET "http://${prefix}/contract/1/?offset=123&pageSize=10&orderStatus=3" ; echo ""
+curl $curl_opts -X GET "http://${prefix}/contractUnpay/1/?" ; echo ""
+curl $curl_opts -X GET "http://${prefix}/contractCount/1/?" ; echo ""
+
+
+
