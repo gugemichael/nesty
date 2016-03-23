@@ -5,7 +5,7 @@ import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import org.nesty.commons.utils.SerializeUtils;
-import org.nesty.core.httpserver.rest.HttpContextInterceptor;
+import org.nesty.core.httpserver.rest.HttpInterceptor;
 import org.nesty.core.httpserver.rest.response.HttpResponse;
 import org.nesty.core.httpserver.rest.response.HttpResponseBuilder;
 import org.nesty.core.httpserver.rest.HttpContext;
@@ -23,9 +23,9 @@ public class ExecutorTask implements Callable<DefaultFullHttpResponse> {
 
     private final URLHandler handler;
     private final HttpContext context;
-    private final List<HttpContextInterceptor> interceptor;
+    private final List<HttpInterceptor> interceptor;
 
-    public ExecutorTask(HttpContext context, List<HttpContextInterceptor> interceptor, URLHandler handler) {
+    public ExecutorTask(HttpContext context, List<HttpInterceptor> interceptor, URLHandler handler) {
         this.context = context;
         this.interceptor = interceptor;
         this.handler = handler;
@@ -34,7 +34,7 @@ public class ExecutorTask implements Callable<DefaultFullHttpResponse> {
     @Override
     public DefaultFullHttpResponse call() {
         // call interceptor chain of recvRequest
-        for (HttpContextInterceptor every : interceptor) {
+        for (HttpInterceptor every : interceptor) {
             if (!every.recvRequest(context))
                 return HttpResponseBuilder.create(HttpResponseStatus.FORBIDDEN);        // httpcode 403
         }
@@ -43,7 +43,7 @@ public class ExecutorTask implements Callable<DefaultFullHttpResponse> {
         HttpResponse result = handler.call(context);
 
         // call interceptor chain of sendResponse
-        for (HttpContextInterceptor every : interceptor)
+        for (HttpInterceptor every : interceptor)
             result = every.sendResponse(context, result);
 
         switch (result.getHttpStatus()) {

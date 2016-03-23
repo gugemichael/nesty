@@ -7,7 +7,7 @@ import org.nesty.commons.constant.http.RequestMethod;
 import org.nesty.commons.exception.ControllerRequestMappingException;
 import org.nesty.commons.utils.ClassUtil;
 import org.nesty.commons.utils.PackageScanner;
-import org.nesty.core.httpserver.rest.HttpContextInterceptor;
+import org.nesty.core.httpserver.rest.HttpInterceptor;
 import org.nesty.core.httpserver.rest.URLHandler;
 import org.nesty.core.httpserver.rest.URLResource;
 import org.nesty.core.httpserver.rest.route.RouteControlloer;
@@ -26,7 +26,7 @@ public abstract class ScanableHttpServerProvider extends HttpServerProvider {
 
     private static final RouteControlloer routeControlloer = new RouteControlloer();
 
-    private static final List<HttpContextInterceptor> interceptor = new LinkedList<>();
+    private static final List<HttpInterceptor> interceptor = new LinkedList<>();
 
     /**
      * scan specified package's all classes
@@ -48,9 +48,9 @@ public abstract class ScanableHttpServerProvider extends HttpServerProvider {
             // @Interceptor
             if (clazz.getAnnotation(Interceptor.class) != null) {
                 checkConstructor(clazz);
-                // must implements HttpContextInterceptor
-                if (clazz.getSuperclass() != HttpContextInterceptor.class)
-                   throw new ControllerRequestMappingException(String.format("%s must implements %s", clazz.getName(), HttpContextInterceptor.class.getName()));
+                // must implements HttpInterceptor
+                if (clazz.getSuperclass() != HttpInterceptor.class)
+                   throw new ControllerRequestMappingException(String.format("%s must implements %s", clazz.getName(), HttpInterceptor.class.getName()));
 
                 try {
 
@@ -59,11 +59,10 @@ public abstract class ScanableHttpServerProvider extends HttpServerProvider {
                      * be known as unordered. But make ensurance that call with registered
                      * sequence.
                      *
-                     * TODO : may be we can indecate the previous {@link Interceptor} by manul
-                     *            like that @Interceptor(previous = PreInterceptor.class)
+                     * TODO : may be we can indecate the previous {@link Interceptor} manully
                      *
                      */
-                    interceptor.add((HttpContextInterceptor) clazz.newInstance());
+                    interceptor.add((HttpInterceptor) clazz.newInstance());
                     System.err.println(clazz.getName());
                 } catch (InstantiationException | IllegalAccessException e) {
                     throw new ControllerRequestMappingException(String.format("%s newInstance() failed %s", clazz.getName(), e.getMessage()));
@@ -131,7 +130,7 @@ public abstract class ScanableHttpServerProvider extends HttpServerProvider {
         return routeControlloer;
     }
 
-    public List<HttpContextInterceptor> getInterceptor() {
+    public List<HttpInterceptor> getInterceptor() {
         return interceptor;
     }
 }

@@ -6,10 +6,6 @@ import org.nesty.commons.annotations.RequestParam;
 import org.nesty.commons.annotations.ResponseBody;
 import org.nesty.commons.constant.http.RequestMethod;
 
-/**
- * Created by zhaowei.hzw on 2015/11/5.
- * 代理绑定、解绑、查询项目关系的接口
- */
 @Controller
 public class BindController {
 

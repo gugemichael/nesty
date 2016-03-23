@@ -3,12 +3,12 @@ package org.nesty.core.httpserver.rest;
 import org.nesty.core.httpserver.rest.response.HttpResponse;
 
 /**
- * An Interceptor of http request and response
+ * Filter of http request and response
  *
  * Author : Michael
  * Date : March 09, 2016
  */
-public abstract class HttpContextInterceptor {
+public abstract class HttpInterceptor {
 
     /**
      * http context of request information. user can update

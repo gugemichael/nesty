@@ -10,9 +10,7 @@ import java.util.List;
 @RequestMapping("/web/api")
 @Controller
 public class ModelController {
-    /**
-     * 特征的处理 读取接口. enum类型
-     */
+
     @RequestMapping(value = "/model/featureSettingEnum.json", method = RequestMethod.GET)
     public
     @ResponseBody
@@ -24,9 +22,6 @@ public class ModelController {
         return new ApiResult<Void>();
     }
 
-    /**
-     * 特征的处理 设置接口. enum类型
-     */
     @RequestMapping(value = "/model/featureSettingEnum.json", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
     public
     @ResponseBody
@@ -37,9 +32,6 @@ public class ModelController {
         return new ApiResult<Boolean>();
     }
 
-    /**
-     * 特征的处理 读取接口. numeric类型
-     */
     @RequestMapping(value = "/model/featureSettingNumeric.json", method = RequestMethod.GET)
     public
     @ResponseBody
@@ -51,9 +43,6 @@ public class ModelController {
         return new ApiResult<Void>();
     }
 
-    /**
-     * 特征的处理 设置接口. numeric类型
-     */
     @RequestMapping(value = "/model/featureSettingNumeric.json", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
     public
     @ResponseBody
@@ -64,9 +53,6 @@ public class ModelController {
         return new ApiResult<Boolean>();
     }
 
-    /**
-     * 模型的 特征的 分析 展现接口 这里对数据库中的json数据直接返回即可
-     */
     @RequestMapping(value = "/model/featureAnalysis.json", method = RequestMethod.GET)
     public
     @ResponseBody
@@ -78,9 +64,6 @@ public class ModelController {
         return new ApiResult<Void>();
     }
 
-    /**
-     * 模型克隆
-     */
     @RequestMapping(value = "/model/clone.json", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
     public
     @ResponseBody
@@ -91,9 +74,6 @@ public class ModelController {
         return new ApiResult<Long>();
     }
 
-    /**
-     * 重命名
-     */
     @RequestMapping(value = "/model/rename.json", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
     public
     @ResponseBody
@@ -106,9 +86,6 @@ public class ModelController {
         return new ApiResult<Boolean>();
     }
 
-    /**
-     * 重命名文件夹
-     */
     @RequestMapping(value = "/model/renameFolder.json", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
     public
     @ResponseBody
@@ -119,9 +96,6 @@ public class ModelController {
         return new ApiResult<Boolean>();
     }
 
-    /**
-     * 功能：获取项目下的全部模型配置信息树.包括 文件夹和模型. 参数：project id 返回值：返回这个project下所有的模型列表
-     */
     @RequestMapping(value = "/model/tree.json", method = RequestMethod.GET)
     public
     @ResponseBody
@@ -132,10 +106,6 @@ public class ModelController {
         return new ApiResult<List<Boolean>>();
     }
 
-    /**
-     * 功能：获取模型的详细信息,只获取模型本身的信息，不获取模型特征列表， 模型特征列表通过“/model/featureList.json”获取
-     * 参数：project id 和 model id 返回值：返回模型的详细信息
-     */
     @RequestMapping(value = "/model/detail.json", method = RequestMethod.GET)
     public
     @ResponseBody
@@ -146,11 +116,6 @@ public class ModelController {
         return new ApiResult<Boolean>();
     }
 
-    /*
-     * 功能：获取模型列表 参数： projectId:工程id status：要查询的模型状态 pageSize：每一页显示的模型的数量
-     * pageNum：显示的页数编号 filterType：筛选类型 filterCondition：具体的删选条件，一个Json串
-     * orderField: 排序字段 orderDirection：排序方向 返回值：返回模型列表信息
-     */
     @RequestMapping(value = "/model/list.json", method = RequestMethod.GET)
     public
     @ResponseBody
@@ -168,10 +133,6 @@ public class ModelController {
         return new ApiResult<Boolean>();
     }
 
-    /*
-     * 功能：获取模型训练结果报告信息 参数：project id 和 model id 返回值：返回模型训练结果报告
-     */
-    // 获取模型的训练结果信息，暂时返回一个String，需要再详细讨论
     @RequestMapping(value = "/model/report.json", method = RequestMethod.GET)
     public
     @ResponseBody
@@ -182,10 +143,6 @@ public class ModelController {
         return new ApiResult<Boolean>();
     }
 
-    /**
-     * 功能：新建一个model 参数：model的目录id， model名称， model使用的样本名称，model所属的项目名称
-     * 返回值：新建的model的id
-     */
     @RequestMapping(value = "/model/create.json", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
     public
     @ResponseBody
@@ -196,9 +153,6 @@ public class ModelController {
         return new ApiResult<Long>();
     }
 
-    /**
-     * 功能：新建一个model的文件夹 参数：nodeId就是父文件夹的id,如果是0就是第一级的文件夹 返回值：boolean
-     */
     @RequestMapping(value = "/model/createFolder.json", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
     public
     @ResponseBody
@@ -209,9 +163,6 @@ public class ModelController {
         return new ApiResult<Boolean>();
     }
 
-    /**
-     * 功能：删除一个model的配置(对应实验的tree) 参数：project id， model id 返回值：删除成功与否
-     */
     @RequestMapping(value = "/model/deleteConfig.json", method = RequestMethod.POST)
     public
     @ResponseBody
@@ -222,9 +173,6 @@ public class ModelController {
         return new ApiResult<Boolean>();
     }
 
-    /**
-     * 功能：删除一个model的目录, 需要把它下面的内容全删掉.有递归操作 参数：project id， model id 返回值：删除成功与否
-     */
     @RequestMapping(value = "/model/deleteFolder.json", method = RequestMethod.POST)
     public
     @ResponseBody
@@ -235,9 +183,6 @@ public class ModelController {
         return new ApiResult<Boolean>();
     }
 
-    /**
-     * 功能：删除一个model的报告(对应模型的列表) 参数：project id， model id 返回值：删除成功与否
-     */
     @RequestMapping(value = "/model/deleteReport.json", method = RequestMethod.POST)
     public
     @ResponseBody
@@ -248,9 +193,6 @@ public class ModelController {
         return new ApiResult<Boolean>();
     }
 
-    /**
-     * 功能：更新model的信息（不包含模型特征信息） 参数：model的相关参数 返回值：更新操作成功与否的标志
-     */
     @RequestMapping(value = "/model/update.json", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
     public
     @ResponseBody
@@ -261,9 +203,6 @@ public class ModelController {
         return new ApiResult<Boolean>();
     }
 
-    /**
-     * 功能：新增一条模型特征 参数：project id， model id， 模型特征id 返回值：新增操作成功与否的标志
-     */
     @RequestMapping(value = "/model/addFeature.json", method = RequestMethod.POST)
     public
     @ResponseBody
@@ -274,10 +213,6 @@ public class ModelController {
         return new ApiResult<Boolean>();
     }
 
-    /**
-     * 删除模型 和 删除模型报告 是分别删除的,互不影响显示 功能：删除一条模型特征 参数：project id， model id， model
-     * feature id 返回值：删除操作成功与否的标志
-     */
     @RequestMapping(value = "/model/deleteFeature.json", method = RequestMethod.POST)
     public
     @ResponseBody
@@ -288,10 +223,6 @@ public class ModelController {
         return new ApiResult<Boolean>();
     }
 
-    /**
-     * 功能：获取模型特征列表 参数： projectId:工程id modelId：模型id pageSize：每一页显示的模型的数量
-     * pageNum：显示的页数编号 orderField: 排序字段 orderDirection：排序方向 返回值：返回模型特征列表信息
-     */
     @RequestMapping(value = "/model/featureList.json", method = RequestMethod.GET)
     public
     @ResponseBody
@@ -307,9 +238,6 @@ public class ModelController {
         return new ApiResult<Boolean>();
     }
 
-    /**
-     * 功能：重新处理一个模型下的所有特征(初始化 和 常规的处理) 参数：project id， model id 返回值：删除成功与否
-     */
     @RequestMapping(value = "/model/dealModelAllFeature.json", method = RequestMethod.POST)
     public
     @ResponseBody
