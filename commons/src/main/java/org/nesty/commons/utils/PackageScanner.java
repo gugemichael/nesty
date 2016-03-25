@@ -28,14 +28,14 @@ public class PackageScanner {
             while (urls.hasMoreElements()) {
                 URI uri = urls.nextElement().toURI();
                 switch (uri.getScheme().toLowerCase()) {
-                    case "jar":
-                        scanFromJarProtocol(loader, classes, uri.getRawSchemeSpecificPart());
-                        break;
-                    case "file":
-                        scanFromFileProtocol(loader, classes, uri.getPath(), packageName);
-                        break;
-                    default:
-                        throw new URISyntaxException(uri.getScheme(), "unknown schema " + uri.getScheme());
+                case "jar":
+                    scanFromJarProtocol(loader, classes, uri.getRawSchemeSpecificPart());
+                    break;
+                case "file":
+                    scanFromFileProtocol(loader, classes, uri.getPath(), packageName);
+                    break;
+                default:
+                    throw new URISyntaxException(uri.getScheme(), "unknown schema " + uri.getScheme());
                 }
 
             }
@@ -50,13 +50,13 @@ public class PackageScanner {
     private Class<?> loadClass(ClassLoader loader, String classPath) throws ClassNotFoundException {
         classPath = classPath.substring(0, classPath.length() - 6);
         return loader.loadClass(classPath);
-//        return Class.forName(classPath);
     }
 
     private void scanFromFileProtocol(ClassLoader loader, List<Class<?>> classes, String dir, String packageName) throws ClassNotFoundException {
         File directory = new File(dir);
-        if (directory.isDirectory()) {
-            for (File classFile : directory.listFiles()) {
+        File[] files = directory.listFiles();
+        if (directory.isDirectory() && files != null) {
+            for (File classFile : files) {
                 if (!classFile.isDirectory() && classFile.getName().endsWith(".class") && !classFile.getName().contains("$")) {
                     String className = String.format("%s.%s", packageName, classFile.getName());
                     classes.add(loadClass(loader, className));
@@ -68,11 +68,11 @@ public class PackageScanner {
     private void scanFromJarProtocol(ClassLoader loader, List<Class<?>> classes, String fullPath) throws ClassNotFoundException {
         final String jar = fullPath.substring(0, fullPath.lastIndexOf('!'));
         final String parent = fullPath.substring(fullPath.lastIndexOf('!') + 2);
+        JarEntry e = null;
 
         JarInputStream jarReader = null;
         try {
             jarReader = new JarInputStream(new URL(jar).openStream());
-            JarEntry e = null;
             while ((e = jarReader.getNextJarEntry()) != null) {
                 String className = e.getName();
                 if (!e.isDirectory() && className.startsWith(parent) && className.endsWith(".class") && !className.contains("$")) {
@@ -81,8 +81,15 @@ public class PackageScanner {
                 }
                 jarReader.closeEntry();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException error) {
+            error.printStackTrace();
+        } finally {
+            try {
+                if (jarReader != null)
+                    jarReader.close();
+            } catch (IOException exp) {
+                exp.printStackTrace();
+            }
         }
     }
 }
