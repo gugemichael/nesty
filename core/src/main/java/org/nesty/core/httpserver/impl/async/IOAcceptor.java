@@ -12,7 +12,7 @@ import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
 import io.netty.handler.timeout.ReadTimeoutHandler;
-import org.nesty.core.httpserver.ScanableHttpServerProvider;
+import org.nesty.core.httpserver.HttpServerRouteProvider;
 
 import java.util.concurrent.TimeUnit;
 
@@ -26,9 +26,14 @@ public class IOAcceptor {
     private final String address;
     private final int port;
 
-    private final ScanableHttpServerProvider httpServer;
+    private final HttpServerRouteProvider httpServer;
 
-    public IOAcceptor(ScanableHttpServerProvider httpServer, String address, int port) {
+
+    private ChannelFuture serverSocket;
+    private EventLoopGroup bossGroup;
+    private EventLoopGroup workerGroup;
+
+    public IOAcceptor(HttpServerRouteProvider httpServer, String address, int port) {
         this.address = address;
         this.port = port;
         this.httpServer = httpServer;
@@ -39,7 +44,7 @@ public class IOAcceptor {
         // accept threads indicated the threads only work on accept() syscall,
         // receive client socket then transfor to io thread pool. bigger pool size
         // conform in SHORT CONNECTION scene (alse HTTP)
-        int acceptThreads = Math.max(2, ((int) (httpServer.getIoThreads() * 0.3) & 0xFFFFFFFE));
+        int acceptThreads = Math.max(2, ((int) (httpServer.options().getIoThreads() * 0.3) & 0xFFFFFFFE));
 
 
         // io threads (worker threads) handle client socket's read(), write()
@@ -48,13 +53,13 @@ public class IOAcceptor {
         //
         // HttpAdapter 's "business logic flow" has params building, validation,
         // logging , so we increase this pool percent in MaxThreads
-        int rwThreads = Math.max(4, ((int) (httpServer.getIoThreads() * 0.7) & 0xFFFFFFFE));
+        int rwThreads = Math.max(4, ((int) (httpServer.options().getIoThreads() * 0.7) & 0xFFFFFFFE));
 
-        EventLoopGroup bossGroup = new NioEventLoopGroup(acceptThreads);
-        EventLoopGroup workerGroup = new NioEventLoopGroup(rwThreads);
+        bossGroup = new NioEventLoopGroup(acceptThreads);
+        workerGroup = new NioEventLoopGroup(rwThreads);
 
         // initial request router's work threads
-        AsyncRequestRouter.newTaskPool(httpServer.getHandlerThreads());
+        AsyncRequestRouter.newTaskPool(httpServer.options().getHandlerThreads());
         AsyncRequestRouter.newURLResourceController(httpServer.getRouteController());
         AsyncRequestRouter.newInterceptor(httpServer.getInterceptor());
 
@@ -65,26 +70,31 @@ public class IOAcceptor {
                     @Override
                     public void initChannel(SocketChannel ch) throws Exception {
                         ch.pipeline()
-                                .addLast("nesty-timer", new ReadTimeoutHandler(httpServer.getHandlerTimeout(), TimeUnit.MILLISECONDS))
+                                .addLast("nesty-timer", new ReadTimeoutHandler(httpServer.options().getHandlerTimeout(), TimeUnit.MILLISECONDS))
                                 .addLast("nesty-http-decoder", new HttpRequestDecoder())
-                                .addLast("nesty-http-aggregator", new HttpObjectAggregator(httpServer.getMaxPacketSize()))
+                                .addLast("nesty-http-aggregator", new HttpObjectAggregator(httpServer.options().getMaxPacketSize()))
                                 .addLast("nesty-request-poster", AsyncRequestRouter.build())
                                 .addLast("nesty-http-encoder", new HttpResponseEncoder());
                     }
                 })
-                .option(ChannelOption.SO_TIMEOUT, httpServer.getHandlerTimeout())
-                .option(ChannelOption.SO_BACKLOG, httpServer.getMaxConnections())
+                .option(ChannelOption.SO_TIMEOUT, httpServer.options().getHandlerTimeout())
+                .option(ChannelOption.SO_BACKLOG, httpServer.options().getMaxConnections())
                 .option(ChannelOption.SO_REUSEADDR, true)
                 .option(ChannelOption.TCP_NODELAY, true)
                 //.option(ChannelOption.SO_LINGER, 0)           // close no wait left data to send
                 .childOption(ChannelOption.SO_KEEPALIVE, true);
 
         // Bind and start to accept incoming connections.
-        ChannelFuture serverSocket = socketServer.bind(address, port).sync();
+        serverSocket = socketServer.bind(address, port).sync();
+    }
 
+    public void join() throws InterruptedException {
         // sync waitting until the server socket is closed.
         serverSocket.channel().closeFuture().sync();
 
+    }
+
+    public void shutdown() {
         workerGroup.shutdownGracefully();
         bossGroup.shutdownGracefully();
     }

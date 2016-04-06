@@ -25,7 +25,7 @@ public class RouteControlloer {
      * @param resource url anaylzed resource
      * @return handler instance or null if it don't exist
      */
-    public URLHandler findURLHandler(URLResource resource) {
+    public URLHandler findURLControlloer(URLResource resource) {
         return controller.get(resource);
     }
 

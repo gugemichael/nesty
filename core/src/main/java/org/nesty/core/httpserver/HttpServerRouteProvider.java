@@ -22,7 +22,7 @@ import java.util.List;
  *
  * Author Michael on 03/03/2016.
  */
-public abstract class ScanableHttpServerProvider extends HttpServerProvider {
+public abstract class HttpServerRouteProvider extends HttpServerProvider {
 
     private static final RouteControlloer routeControlloer = new RouteControlloer();
 
@@ -33,8 +33,7 @@ public abstract class ScanableHttpServerProvider extends HttpServerProvider {
      */
     private PackageScanner scanner = new PackageScanner();
 
-    @Override
-    public HttpServer scanHttpController(String packageName) throws ControllerRequestMappingException {
+    public HttpServerRouteProvider scanHttpController(String packageName) throws ControllerRequestMappingException {
         // find all Class
         List<Class<?>> classList = null;
         try {
@@ -50,7 +49,7 @@ public abstract class ScanableHttpServerProvider extends HttpServerProvider {
                 checkConstructor(clazz);
                 // must implements HttpInterceptor
                 if (clazz.getSuperclass() != HttpInterceptor.class)
-                   throw new ControllerRequestMappingException(String.format("%s must implements %s", clazz.getName(), HttpInterceptor.class.getName()));
+                    throw new ControllerRequestMappingException(String.format("%s must implements %s", clazz.getName(), HttpInterceptor.class.getName()));
 
                 try {
 
@@ -63,7 +62,6 @@ public abstract class ScanableHttpServerProvider extends HttpServerProvider {
                      *
                      */
                     interceptor.add((HttpInterceptor) clazz.newInstance());
-                    System.err.println(clazz.getName());
                 } catch (InstantiationException | IllegalAccessException e) {
                     throw new ControllerRequestMappingException(String.format("%s newInstance() failed %s", clazz.getName(), e.getMessage()));
                 }
@@ -111,8 +109,6 @@ public abstract class ScanableHttpServerProvider extends HttpServerProvider {
                      */
                     if (!routeControlloer.put(urlResource, urlHandler))
                         throw new ControllerRequestMappingException(String.format("%s.%s annotation is duplicated", clazz.getName(), method.getName()));
-
-                    System.err.println(urlHandler.toString());
                 }
             }
         }

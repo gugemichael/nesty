@@ -48,12 +48,30 @@ Class | null | from http body serializer parsed
 
 public static void main(String[] args) {
 
-	// start httpserver directly
-	AsyncHttpServerProvider.create("127.0.0.1", 8080)
-						.scanHttpController("org.nesty.example.httpserver.handler")
-						.start();
+        // 1. create httpserver
+        HttpServerRouteProvider server = AsyncHttpServerProvider.create("127.0.0.1", 8080);
 
-	// would not to reach here ......
+        // 2. choose http params. this is unnecessary
+        server.useOptions(new HttpServerOptions().setMaxConnections(4096)
+                                                .setHandlerTimeout(10000)
+                                                .setIoThreads(8)
+                                                .setHandlerThreads(256));
+
+        server.scanHttpController("com.nesty.test.neptune")
+                .scanHttpController("com.nesty.test.billing")
+                .scanHttpController("org.nesty.example.httpserver.handler");
+
+        // 3. start server and block for servicing
+        if (!server.start())
+            System.err.println("HttpServer run failed");
+
+        try {
+            server.join();
+            server.shutdown();
+        } catch (InterruptedException e) {
+        }
+
+        // would not to reach here as usual ......
 }
 ```
 

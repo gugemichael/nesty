@@ -1,14 +1,13 @@
 package org.nesty.core.httpserver.impl.async;
 
-import org.nesty.core.httpserver.HttpServer;
-import org.nesty.core.httpserver.ScanableHttpServerProvider;
+import org.nesty.core.httpserver.HttpServerRouteProvider;
 
 /**
  * nesty
  *
  * Author Michael on 03/03/2016.
  */
-public class AsyncHttpServerProvider extends ScanableHttpServerProvider {
+public class AsyncHttpServerProvider extends HttpServerRouteProvider {
 
     /**
      * http protocol acceptor
@@ -20,7 +19,7 @@ public class AsyncHttpServerProvider extends ScanableHttpServerProvider {
     }
 
 
-    public static HttpServer create(String address, Integer port) {
+    public static AsyncHttpServerProvider create(String address, Integer port) {
         return new AsyncHttpServerProvider(address, port);
     }
 
@@ -39,4 +38,13 @@ public class AsyncHttpServerProvider extends ScanableHttpServerProvider {
         }
     }
 
+    @Override
+    public void join() throws InterruptedException {
+        ioAcceptor.join();
+    }
+
+    @Override
+    public void shutdown() {
+        ioAcceptor.shutdown();
+    }
 }
