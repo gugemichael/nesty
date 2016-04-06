@@ -29,9 +29,10 @@ public class URLResource {
         return resource;
     }
 
+
     @Override
     public String toString() {
-        return String.format("identifier{%s}", identifier.toString());
+        return identifier.toString();
     }
 
     @Override
@@ -89,7 +90,6 @@ public class URLResource {
          * used to hold the Entry. but get() use hashcode() and equals() to search
          * the Entry. so the correctness has no affected but search performance
          * on non-exist Entry searching.
-         *
          */
         @Override
         public int hashCode() {
@@ -98,7 +98,7 @@ public class URLResource {
 
         @Override
         public String toString() {
-            return String.format("fragments=%s,requestMethod=%s", Joiner.on("/").skipNulls().join(fragments), requestMethod.name());
+            return String.format("%s, %s", requestMethod.name(), Joiner.on("/").skipNulls().join(fragments));
         }
     }
 }

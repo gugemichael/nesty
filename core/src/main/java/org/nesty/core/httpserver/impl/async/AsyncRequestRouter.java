@@ -9,10 +9,11 @@ import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.timeout.ReadTimeoutException;
 import org.nesty.commons.constant.http.RequestMethod;
+import org.nesty.core.httpserver.HttpServerStats;
 import org.nesty.core.httpserver.rest.HttpContext;
-import org.nesty.core.httpserver.rest.URLHandler;
+import org.nesty.core.httpserver.rest.controller.URLController;
 import org.nesty.core.httpserver.rest.URLResource;
-import org.nesty.core.httpserver.rest.executor.ExecutorTask;
+import org.nesty.core.httpserver.rest.ExecutorTask;
 import org.nesty.core.httpserver.rest.request.NettyHttpRequestVisitor;
 import org.nesty.core.httpserver.rest.response.HttpResponseBuilder;
 import org.nesty.core.httpserver.utils.HttpUtils;
@@ -35,6 +36,8 @@ public class AsyncRequestRouter extends AsyncRequestReceiver {
 
     @Override
     protected void channelRead0(final ChannelHandlerContext ctx, final FullHttpRequest httpRequest) throws Exception {
+        super.channelRead0(ctx, httpRequest);
+
         this.context = ctx;
         this.httpRequest = httpRequest;
 
@@ -61,10 +64,10 @@ public class AsyncRequestRouter extends AsyncRequestReceiver {
             return;
 
         /**
-         * 2. according to URL to search the URLHandler
+         * 2. according to URL to search the URLController
          *
          */
-        URLHandler handler = findContoller();
+        URLController handler = findContoller();
 
         /**
          * 3. execute controller logic to async executor thread pool
@@ -83,20 +86,36 @@ public class AsyncRequestRouter extends AsyncRequestReceiver {
         return true;
     }
 
-    private URLHandler findContoller() {
+    private URLController findContoller() {
         // build URLResource from incoming http request
         URLResource resource = URLResource.fromHttp(httpRequest.getUri(), HttpUtils.convertHttpMethodFromNetty(httpRequest));
-        URLHandler handler;
+        URLController handler;
         if ((handler = routeController.findURLControlloer(resource)) == null) {
             // httpcode 404
             writeAndClose(HttpResponseBuilder.create(HttpResponseStatus.NOT_FOUND));
+            HttpServerStats.REQUESTS_MISS.incrementAndGet();
+            return null;
         }
+
+        if (!handler.isInternal()) {
+            HttpServerStats.REQUESTS_HIT.incrementAndGet();
+            handler.hit();
+        }
+
         return handler;
     }
 
-    private void executeAsyncTask(URLHandler handler) {
+    private void executeAsyncTask(URLController controller) {
+
+        final HttpContext httpContext = HttpContext.build(new NettyHttpRequestVisitor(context.channel(), httpRequest));
+
+        if (!controller.isInternal()) {
+            HttpServerStats.LAST_SERV_TIME = System.currentTimeMillis();
+            HttpServerStats.LAST_SERV_ID = httpContext.getRequestId();
+        }
+
         // build logic task
-        ExecutorTask task = new ExecutorTask(HttpContext.build(new NettyHttpRequestVisitor(context.channel(), httpRequest)), interceptor, handler);
+        ExecutorTask task = new ExecutorTask(httpContext, interceptor, controller);
 
         Futures.addCallback(taskWorkerPool.submit(task), new FutureCallback<DefaultFullHttpResponse>() {
             @Override
@@ -106,6 +125,7 @@ public class AsyncRequestRouter extends AsyncRequestReceiver {
 
             @Override
             public void onFailure(Throwable e) {
+                HttpServerStats.LAST_SERV_FAIL_ID = httpContext.getRequestId();
                 e.printStackTrace();
                 // httpcode 503
                 writeAndClose(HttpResponseBuilder.create(HttpResponseStatus.SERVICE_UNAVAILABLE));

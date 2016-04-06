@@ -29,7 +29,7 @@ public class SimpleHttpServer {
         try {
             server.join();
             server.shutdown();
-        } catch (InterruptedException e) {
+        } catch (InterruptedException ignored) {
         }
 
         // would not to reach here as usual ......

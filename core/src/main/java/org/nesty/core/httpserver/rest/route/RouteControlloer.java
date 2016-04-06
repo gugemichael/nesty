@@ -1,6 +1,6 @@
 package org.nesty.core.httpserver.rest.route;
 
-import org.nesty.core.httpserver.rest.URLHandler;
+import org.nesty.core.httpserver.rest.controller.URLController;
 import org.nesty.core.httpserver.rest.URLResource;
 
 import java.util.HashMap;
@@ -14,7 +14,7 @@ import java.util.Map;
  */
 public class RouteControlloer {
 
-    private final Map<URLResource, URLHandler> controller = new HashMap<>(256);
+    private final Map<URLResource, URLController> controller = new HashMap<>(256);
 
     public RouteControlloer() {
     }
@@ -25,11 +25,11 @@ public class RouteControlloer {
      * @param resource url anaylzed resource
      * @return handler instance or null if it don't exist
      */
-    public URLHandler findURLControlloer(URLResource resource) {
+    public URLController findURLControlloer(URLResource resource) {
         return controller.get(resource);
     }
 
-    public synchronized boolean put(URLResource resource, URLHandler handler) {
+    public synchronized boolean put(URLResource resource, URLController handler) {
         return controller.put(resource, handler) == null;
     }
 }

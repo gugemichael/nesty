@@ -2,9 +2,11 @@ package org.nesty.core.httpserver.impl.async;
 
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.FullHttpRequest;
-import org.nesty.core.httpserver.rest.HttpInterceptor;
+import org.nesty.core.httpserver.HttpServerStats;
+import org.nesty.core.httpserver.rest.interceptor.HttpInterceptor;
 import org.nesty.core.httpserver.rest.route.RouteControlloer;
 
 import java.util.List;
@@ -41,5 +43,21 @@ public abstract class AsyncRequestReceiver extends SimpleChannelInboundHandler<F
 
     public static void newInterceptor(List<HttpInterceptor> interceptorList) {
         interceptor = interceptorList;
+    }
+
+    @Override
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        super.channelActive(ctx);
+        HttpServerStats.CONNECTIONS.incrementAndGet();
+    }
+
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        super.channelInactive(ctx);
+        HttpServerStats.CONNECTIONS.decrementAndGet();
+    }
+
+    @Override
+    protected void channelRead0(ChannelHandlerContext channelHandlerContext, FullHttpRequest fullHttpRequest) throws Exception {
     }
 }

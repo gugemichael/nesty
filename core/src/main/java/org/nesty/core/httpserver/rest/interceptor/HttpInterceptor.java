@@ -1,6 +1,7 @@
-package org.nesty.core.httpserver.rest;
+package org.nesty.core.httpserver.rest.interceptor;
 
-import org.nesty.core.httpserver.rest.response.HttpResponse;
+import io.netty.handler.codec.http.DefaultFullHttpResponse;
+import org.nesty.core.httpserver.rest.HttpContext;
 
 /**
  * Filter of http request and response
@@ -23,13 +24,14 @@ public abstract class HttpInterceptor {
 
     /**
      * http context of request information. user can update
-     * the value of context or change the response
+     * the value of context or change the response. don't accept null
+     * returned. it will be ignored
      *
      * @param context  http context
      * @param response represent response
      * @return response new response instance or current Object instance
      */
-    public HttpResponse sendResponse(final HttpContext context, final HttpResponse response) {
+    public DefaultFullHttpResponse sendResponse(final HttpContext context, final DefaultFullHttpResponse response) {
         return response;
     }
 }

@@ -1,9 +1,13 @@
-package org.nesty.core.httpserver.rest;
+package org.nesty.core.httpserver.rest.controller;
 
 import org.nesty.commons.exception.ControllerParamsNotMatchException;
 import org.nesty.commons.exception.ControllerParamsParsedException;
 import org.nesty.core.httpserver.impl.async.HttpResultStatus;
+import org.nesty.core.httpserver.rest.ControllerClassDescriptor;
+import org.nesty.core.httpserver.rest.ControllerMethodDescriptor;
+import org.nesty.core.httpserver.rest.HttpContext;
 import org.nesty.core.httpserver.rest.response.HttpResponse;
+import org.nesty.core.httpserver.utils.Countable;
 
 import java.lang.reflect.Method;
 
@@ -12,21 +16,32 @@ import java.lang.reflect.Method;
  *
  * Author Michael on 03/03/2016.
  */
-public class URLHandler {
+public class URLController extends Countable {
 
     // target class
     private ControllerClassDescriptor provider;
     // target method
     private ControllerMethodDescriptor procedure;
 
-    private URLHandler() {
+    private boolean internal = false;
+
+    private URLController() {
     }
 
-    public static URLHandler fromProvider(String URI, Class<?> provider, Method procedure) {
-        URLHandler handler = new URLHandler();
+    public static URLController fromProvider(String URI, Class<?> provider, Method procedure) {
+        URLController handler = new URLController();
         handler.provider = new ControllerClassDescriptor(provider);
         handler.procedure = new ControllerMethodDescriptor(URI, procedure);
         return handler;
+    }
+
+    public URLController internal() {
+        this.internal = true;
+        return this;
+    }
+
+    public boolean isInternal() {
+        return this.internal;
     }
 
     public HttpResponse call(HttpContext context) {

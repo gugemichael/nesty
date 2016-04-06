@@ -7,9 +7,11 @@ import org.nesty.commons.constant.http.RequestMethod;
 import org.nesty.commons.exception.ControllerRequestMappingException;
 import org.nesty.commons.utils.ClassUtil;
 import org.nesty.commons.utils.PackageScanner;
-import org.nesty.core.httpserver.rest.HttpInterceptor;
-import org.nesty.core.httpserver.rest.URLHandler;
 import org.nesty.core.httpserver.rest.URLResource;
+import org.nesty.core.httpserver.rest.controller.DefaultController;
+import org.nesty.core.httpserver.rest.controller.URLController;
+import org.nesty.core.httpserver.rest.interceptor.HttpInterceptor;
+import org.nesty.core.httpserver.rest.interceptor.DefaultInterceptor;
 import org.nesty.core.httpserver.rest.route.RouteControlloer;
 
 import java.lang.reflect.Method;
@@ -28,6 +30,14 @@ public abstract class HttpServerRouteProvider extends HttpServerProvider {
 
     private static final List<HttpInterceptor> interceptor = new LinkedList<>();
 
+    static {
+        // default Interceptor
+        interceptor.add(new DefaultInterceptor());
+        // default Controller (URI path is "/")
+        Method root = DefaultController.class.getMethods()[0];
+        routeControlloer.put(URLResource.fromHttp("/", RequestMethod.GET), URLController.fromProvider("/", DefaultController.class, root).internal());
+    }
+
     /**
      * scan specified package's all classes
      */
@@ -43,6 +53,7 @@ public abstract class HttpServerRouteProvider extends HttpServerProvider {
         }
 
         RequestMapping clazzLevelRequestMapping = null;
+
         for (Class<?> clazz : classList) {
             // @Interceptor
             if (clazz.getAnnotation(Interceptor.class) != null) {
@@ -96,7 +107,7 @@ public abstract class HttpServerRouteProvider extends HttpServerProvider {
                     RequestMethod requestMethod = requestMapping.method();
 
                     URLResource urlResource = URLResource.fromHttp(uri, requestMethod);
-                    URLHandler urlHandler = URLHandler.fromProvider(uri, clazz, method);
+                    URLController urlController = URLController.fromProvider(uri, clazz, method);
 
                     /**
                      * register the controller to controller map {@link RouteControlloer}. put() will return
@@ -107,8 +118,11 @@ public abstract class HttpServerRouteProvider extends HttpServerProvider {
                      * TODO : we throw exception here. let users to know and decide what to do
                      *
                      */
-                    if (!routeControlloer.put(urlResource, urlHandler))
+                    if (!routeControlloer.put(urlResource, urlController))
                         throw new ControllerRequestMappingException(String.format("%s.%s annotation is duplicated", clazz.getName(), method.getName()));
+
+                    // add monitor
+                    HttpServerStats.RESOURCES.put(urlResource, urlController);
                 }
             }
         }

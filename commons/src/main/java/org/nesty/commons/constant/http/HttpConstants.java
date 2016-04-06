@@ -13,5 +13,6 @@ public class HttpConstants {
     public static final String CONTENT_TYPE_JSON = "application/json";
 
     public static final String HEADER_SERVER = "Server";
+    public static final String HEADER_REQUEST_ID = "Request-Id";
     public static final String HEADER_CONTENT_LENGTH = "Content-Length";
 }
