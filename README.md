@@ -97,6 +97,8 @@ More examples. Please visit https://github.com/gugemichael/nesty/wiki/More-Examp
 
 * Netty Bootstrap(io threads) + ThreadPool(logic threads)
 
+![screenshot](http://img1.tbcdn.cn/L1/461/1/40ef4fb553fb9b565ddf79989a6f17877dcb3de7)
+
 ## Performance
 
 java -server -Xmx4G -Xms4G -Xmn1536M -XX:+UseConcMarkSweepGC -XX:+UseParNewGC -XX:PermSize=256m -XX:MaxPermSize=256m -XX:+DisableExplicitGC
