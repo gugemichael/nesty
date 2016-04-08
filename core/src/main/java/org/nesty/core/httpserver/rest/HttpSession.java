@@ -5,6 +5,10 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import java.util.*;
 
 /**
+ * Similar javax.servlet and SpringMVC HttpContext implemention
+ * parameter. can be used for migration code from SpringMVC
+ *
+ *
  * Author : Michael
  * Date : March 11, 2016
  */

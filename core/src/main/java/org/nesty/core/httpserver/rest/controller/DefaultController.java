@@ -1,6 +1,7 @@
 package org.nesty.core.httpserver.rest.controller;
 
 import org.nesty.commons.annotations.Controller;
+import org.nesty.commons.annotations.RequestMapping;
 import org.nesty.core.httpserver.HttpServerStats;
 import org.nesty.core.httpserver.rest.URLResource;
 
@@ -10,6 +11,7 @@ import java.util.Map;
 @Controller
 public class DefaultController {
 
+    @RequestMapping("/")
     public RootResponse root() {
         RootResponse response = new RootResponse();
         response.REQUESTS_MISS = HttpServerStats.REQUESTS_MISS.get();

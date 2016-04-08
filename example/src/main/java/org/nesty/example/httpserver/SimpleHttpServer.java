@@ -22,11 +22,12 @@ public class SimpleHttpServer {
                 .scanHttpController("com.nesty.test.billing")
                 .scanHttpController("org.nesty.example.httpserver.handler");
 
-        // 3. start server and block for servicing
+        // 3. start http server
         if (!server.start())
             System.err.println("HttpServer run failed");
 
         try {
+            // join and wait here
             server.join();
             server.shutdown();
         } catch (InterruptedException ignored) {

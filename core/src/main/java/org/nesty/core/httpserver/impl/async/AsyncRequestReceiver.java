@@ -7,7 +7,7 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.FullHttpRequest;
 import org.nesty.core.httpserver.HttpServerStats;
 import org.nesty.core.httpserver.rest.interceptor.HttpInterceptor;
-import org.nesty.core.httpserver.rest.route.RouteControlloer;
+import org.nesty.core.httpserver.rest.ControllerRouter;
 
 import java.util.List;
 
@@ -21,7 +21,7 @@ public abstract class AsyncRequestReceiver extends SimpleChannelInboundHandler<F
     /**
      * resource controller route mapping
      */
-    protected static volatile RouteControlloer routeController;
+    protected static volatile ControllerRouter controllerRouter;
 
     /**
      * resource controller route mapping
@@ -37,11 +37,11 @@ public abstract class AsyncRequestReceiver extends SimpleChannelInboundHandler<F
         taskWorkerPool = MoreExecutors.listeningDecorator(AsyncExecutors.newExecutors(workers));
     }
 
-    public static void newURLResourceController(RouteControlloer routeControllerMap) {
-        routeController = routeControllerMap;
+    public static void useURLResourceController(ControllerRouter routeControllerMap) {
+        controllerRouter = routeControllerMap;
     }
 
-    public static void newInterceptor(List<HttpInterceptor> interceptorList) {
+    public static void useInterceptor(List<HttpInterceptor> interceptorList) {
         interceptor = interceptorList;
     }
 

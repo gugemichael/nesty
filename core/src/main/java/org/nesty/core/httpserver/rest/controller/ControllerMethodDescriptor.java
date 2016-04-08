@@ -1,4 +1,4 @@
-package org.nesty.core.httpserver.rest;
+package org.nesty.core.httpserver.rest.controller;
 
 import org.nesty.commons.annotations.RequestBody;
 import org.nesty.commons.annotations.Header;
@@ -8,7 +8,10 @@ import org.nesty.commons.exception.ControllerParamsNotMatchException;
 import org.nesty.commons.exception.ControllerParamsParsedException;
 import org.nesty.commons.exception.SerializeException;
 import org.nesty.commons.utils.SerializeUtils;
-import org.nesty.core.httpserver.rest.ControllerMethodDescriptor.MethodParams.AnnotationType;
+import org.nesty.core.httpserver.rest.controller.ControllerMethodDescriptor.MethodParams.AnnotationType;
+import org.nesty.core.httpserver.rest.HttpContext;
+import org.nesty.core.httpserver.rest.HttpSession;
+import org.nesty.core.httpserver.rest.URLResource;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -34,9 +37,6 @@ public class ControllerMethodDescriptor {
         Annotation[][] annotations = method.getParameterAnnotations();
         Class<?>[] paramsTypes = method.getParameterTypes();
         int total = paramsTypes.length;
-
-//        if (annotations.length != paramsTypes.length || annotations.length + 1 != paramsTypes.length)
-//            throw new IllegalArgumentException(String.format("%s parameters annotation invalid", method.getName()));
 
         this.params = new MethodParams[total];
 
@@ -108,7 +108,6 @@ public class ControllerMethodDescriptor {
         String value = null;
         // iterate whole method params
         for (int i = 0; i != paramList.length; i++) {
-//            System.err.println(i + " | " + params[i].annotationType);
             boolean required = true;
             boolean auto = false;
             boolean serialize = false;

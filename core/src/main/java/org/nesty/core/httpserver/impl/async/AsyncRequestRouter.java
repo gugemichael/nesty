@@ -67,14 +67,14 @@ public class AsyncRequestRouter extends AsyncRequestReceiver {
          * 2. according to URL to search the URLController
          *
          */
-        URLController handler = findContoller();
+        URLController controller = findController();
 
         /**
          * 3. execute controller logic to async executor thread pool
          *
          */
-        if (handler != null)
-            executeAsyncTask(handler);
+        if (controller != null)
+            executeAsyncTask(controller);
     }
 
     private boolean checkup() {
@@ -86,11 +86,11 @@ public class AsyncRequestRouter extends AsyncRequestReceiver {
         return true;
     }
 
-    private URLController findContoller() {
+    private URLController findController() {
         // build URLResource from incoming http request
         URLResource resource = URLResource.fromHttp(httpRequest.getUri(), HttpUtils.convertHttpMethodFromNetty(httpRequest));
         URLController handler;
-        if ((handler = routeController.findURLControlloer(resource)) == null) {
+        if ((handler = controllerRouter.findURLControlloer(resource)) == null) {
             // httpcode 404
             writeAndClose(HttpResponseBuilder.create(HttpResponseStatus.NOT_FOUND));
             HttpServerStats.REQUESTS_MISS.incrementAndGet();

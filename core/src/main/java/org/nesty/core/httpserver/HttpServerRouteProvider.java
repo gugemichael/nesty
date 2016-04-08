@@ -12,7 +12,7 @@ import org.nesty.core.httpserver.rest.controller.DefaultController;
 import org.nesty.core.httpserver.rest.controller.URLController;
 import org.nesty.core.httpserver.rest.interceptor.HttpInterceptor;
 import org.nesty.core.httpserver.rest.interceptor.DefaultInterceptor;
-import org.nesty.core.httpserver.rest.route.RouteControlloer;
+import org.nesty.core.httpserver.rest.ControllerRouter;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -26,16 +26,18 @@ import java.util.List;
  */
 public abstract class HttpServerRouteProvider extends HttpServerProvider {
 
-    private static final RouteControlloer routeControlloer = new RouteControlloer();
+    private static final ControllerRouter CONTROLLER_ROUTER = new ControllerRouter();
 
     private static final List<HttpInterceptor> interceptor = new LinkedList<>();
 
     static {
+
         // default Interceptor
         interceptor.add(new DefaultInterceptor());
+
         // default Controller (URI path is "/")
         Method root = DefaultController.class.getMethods()[0];
-        routeControlloer.put(URLResource.fromHttp("/", RequestMethod.GET), URLController.fromProvider("/", DefaultController.class, root).internal());
+        CONTROLLER_ROUTER.put(URLResource.fromHttp("/", RequestMethod.GET), URLController.fromProvider("/", DefaultController.class, root).internal());
     }
 
     /**
@@ -110,7 +112,7 @@ public abstract class HttpServerRouteProvider extends HttpServerProvider {
                     URLController urlController = URLController.fromProvider(uri, clazz, method);
 
                     /**
-                     * register the controller to controller map {@link RouteControlloer}. put() will return
+                     * register the controller to controller map {@link ControllerRouter}. put() will return
                      * false on dupliacted URLReousource key. Duplicated URLResource means they have same
                      * url, url variabls and http method. we will confuse on them and couldn't decide which
                      * controller method to invoke.
@@ -118,7 +120,7 @@ public abstract class HttpServerRouteProvider extends HttpServerProvider {
                      * TODO : we throw exception here. let users to know and decide what to do
                      *
                      */
-                    if (!routeControlloer.put(urlResource, urlController))
+                    if (!CONTROLLER_ROUTER.put(urlResource, urlController))
                         throw new ControllerRequestMappingException(String.format("%s.%s annotation is duplicated", clazz.getName(), method.getName()));
 
                     // add monitor
@@ -136,8 +138,8 @@ public abstract class HttpServerRouteProvider extends HttpServerProvider {
         return true;
     }
 
-    public RouteControlloer getRouteController() {
-        return routeControlloer;
+    public ControllerRouter getRouteController() {
+        return CONTROLLER_ROUTER;
     }
 
     public List<HttpInterceptor> getInterceptor() {

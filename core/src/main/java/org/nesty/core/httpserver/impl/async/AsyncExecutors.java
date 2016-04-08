@@ -9,7 +9,7 @@ public class AsyncExecutors {
      * max async executor's queue length
      *
      */
-    public static final int MAX_ASYNC_QUEUE_SIZE = 100000;
+    public static final int MAX_ASYNC_QUEUE_SIZE = 500000;
 
     /**
      * default thread factory

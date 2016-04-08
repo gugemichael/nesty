@@ -3,8 +3,6 @@ package org.nesty.core.httpserver.rest.controller;
 import org.nesty.commons.exception.ControllerParamsNotMatchException;
 import org.nesty.commons.exception.ControllerParamsParsedException;
 import org.nesty.core.httpserver.impl.async.HttpResultStatus;
-import org.nesty.core.httpserver.rest.ControllerClassDescriptor;
-import org.nesty.core.httpserver.rest.ControllerMethodDescriptor;
 import org.nesty.core.httpserver.rest.HttpContext;
 import org.nesty.core.httpserver.rest.response.HttpResponse;
 import org.nesty.core.httpserver.utils.Countable;

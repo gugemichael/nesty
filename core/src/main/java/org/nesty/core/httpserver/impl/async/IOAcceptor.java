@@ -60,8 +60,8 @@ public class IOAcceptor {
 
         // initial request router's work threads
         AsyncRequestRouter.newTaskPool(httpServer.options().getHandlerThreads());
-        AsyncRequestRouter.newURLResourceController(httpServer.getRouteController());
-        AsyncRequestRouter.newInterceptor(httpServer.getInterceptor());
+        AsyncRequestRouter.useURLResourceController(httpServer.getRouteController());
+        AsyncRequestRouter.useInterceptor(httpServer.getInterceptor());
 
         ServerBootstrap socketServer = new ServerBootstrap();
         socketServer.group(bossGroup, workerGroup)

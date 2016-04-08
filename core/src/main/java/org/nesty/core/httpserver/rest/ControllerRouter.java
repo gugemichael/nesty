@@ -1,7 +1,6 @@
-package org.nesty.core.httpserver.rest.route;
+package org.nesty.core.httpserver.rest;
 
 import org.nesty.core.httpserver.rest.controller.URLController;
-import org.nesty.core.httpserver.rest.URLResource;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,11 +11,11 @@ import java.util.Map;
  * Author : Michael
  * Date : March 07, 2016
  */
-public class RouteControlloer {
+public class ControllerRouter {
 
     private final Map<URLResource, URLController> controller = new HashMap<>(256);
 
-    public RouteControlloer() {
+    public ControllerRouter() {
     }
 
     /**
