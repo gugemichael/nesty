@@ -37,7 +37,7 @@ public abstract class HttpServerRouteProvider extends HttpServerProvider {
 
         // default Controller (URI path is "/")
         Method root = DefaultController.class.getMethods()[0];
-        CONTROLLER_ROUTER.put(URLResource.fromHttp("/", RequestMethod.GET), URLController.fromProvider("/", DefaultController.class, root).internal());
+        CONTROLLER_ROUTER.register(URLResource.fromHttp("/", RequestMethod.GET), URLController.fromProvider("/", DefaultController.class, root).internal());
     }
 
     /**
@@ -112,7 +112,7 @@ public abstract class HttpServerRouteProvider extends HttpServerProvider {
                     URLController urlController = URLController.fromProvider(uri, clazz, method);
 
                     /**
-                     * register the controller to controller map {@link ControllerRouter}. put() will return
+                     * register the controller to controller map {@link ControllerRouter}.register() will return
                      * false on dupliacted URLReousource key. Duplicated URLResource means they have same
                      * url, url variabls and http method. we will confuse on them and couldn't decide which
                      * controller method to invoke.
@@ -120,7 +120,7 @@ public abstract class HttpServerRouteProvider extends HttpServerProvider {
                      * TODO : we throw exception here. let users to know and decide what to do
                      *
                      */
-                    if (!CONTROLLER_ROUTER.put(urlResource, urlController))
+                    if (!CONTROLLER_ROUTER.register(urlResource, urlController))
                         throw new ControllerRequestMappingException(String.format("%s.%s annotation is duplicated", clazz.getName(), method.getName()));
 
                     // add monitor

@@ -29,6 +29,13 @@ public class URLResource {
         return resource;
     }
 
+    public RequestMethod getRequestMethod() {
+        return identifier.requestMethod;
+    }
+
+    public List<String> getFragments() {
+        return identifier.fragments;
+    }
 
     @Override
     public String toString() {
@@ -50,7 +57,7 @@ public class URLResource {
      * equals and hashcode id
      */
     static class URLResourceIdentifier {
-        protected List<String> fragments = new ArrayList<>(32);
+        protected List<String> fragments = new ArrayList<>(64);
         protected RequestMethod requestMethod;
 
         public static URLResourceIdentifier analyse(String url) {
@@ -86,7 +93,7 @@ public class URLResource {
          * it will same as even rest array is diffrent. this can cause hashcode
          * is equaled when http method and url terms array size are same.
          *
-         * HashMap put(K, V) use hashcode() to determine which bucket is
+         * HashMap (K, V) use hashcode() to determine which bucket is
          * used to hold the Entry. but get() use hashcode() and equals() to search
          * the Entry. so the correctness has no affected but search performance
          * on non-exist Entry searching.

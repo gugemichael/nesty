@@ -9,7 +9,9 @@ public class AsyncExecutors {
      * max async executor's queue length
      *
      */
-    public static final int MAX_ASYNC_QUEUE_SIZE = 500000;
+    private static final int MAX_ASYNC_QUEUE_SIZE = 50000;
+
+    private static final BlockingQueue<Runnable> innerQueue = new ArrayBlockingQueue<>(MAX_ASYNC_QUEUE_SIZE);
 
     /**
      * default thread factory
@@ -33,7 +35,7 @@ public class AsyncExecutors {
 
         return new ThreadPoolExecutor(Math.max(4, workers / 4), Math.max(4, workers),           // from total/4 to total
                                                     10, TimeUnit.SECONDS,                                              // 10s to recycle idle thread
-                                                    new ArrayBlockingQueue<Runnable>(MAX_ASYNC_QUEUE_SIZE),     // bounded queue
+                                                    innerQueue,                                                              // bounded queue
                                                     factory,                                                                    // named factory
                                                     new ThreadPoolExecutor.CallerRunsPolicy()                    // caller run
         );
