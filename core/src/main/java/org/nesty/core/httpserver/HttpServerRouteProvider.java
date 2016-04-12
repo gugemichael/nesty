@@ -11,7 +11,6 @@ import org.nesty.core.httpserver.rest.URLResource;
 import org.nesty.core.httpserver.rest.controller.DefaultController;
 import org.nesty.core.httpserver.rest.controller.URLController;
 import org.nesty.core.httpserver.rest.interceptor.HttpInterceptor;
-import org.nesty.core.httpserver.rest.interceptor.DefaultInterceptor;
 import org.nesty.core.httpserver.rest.ControllerRouter;
 
 import java.lang.reflect.Method;
@@ -34,9 +33,6 @@ public abstract class HttpServerRouteProvider extends HttpServerProvider {
     private static final String ROOT_PATH = "/";
 
     static {
-
-        // default Interceptor
-        interceptors.add(new DefaultInterceptor());
 
         // default Controller (URI path is "/")
         Method root = DefaultController.class.getMethods()[0];

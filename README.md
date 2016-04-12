@@ -104,9 +104,15 @@ More examples. Please visit https://github.com/gugemichael/nesty/wiki/More-Examp
 
 java -server -Xmx4G -Xms4G -Xmn1536M -XX:+UseConcMarkSweepGC -XX:+UseParNewGC -XX:PermSize=256m -XX:MaxPermSize=256m -XX:+DisableExplicitGC
 
+Http short connection
 * Conccurent : 512 http connections 
 * Qps : 40,000+
-* Latency : < 5ms
+* Latency : < 10ms
+
+Http long connection (Connection: keep-alive)
+* Conccurent : 512 http connections 
+* Qps : 80,000 ~ 100,000
+* Latency : < 50ms
 
 detail : https://github.com/gugemichael/nesty/wiki/Performance-Detail
 

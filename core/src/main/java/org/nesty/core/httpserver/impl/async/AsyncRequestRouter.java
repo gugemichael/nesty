@@ -50,7 +50,7 @@ public class AsyncRequestRouter extends AsyncRequestReceiver {
         if (cause instanceof ReadTimeoutException) {
             // httpcode 504
             if (context.channel().isOpen())
-                sendResponse(HttpResponseBuilder.create(HttpResponseStatus.GATEWAY_TIMEOUT));
+                sendResponse(HttpResponseBuilder.create(httpContext, HttpResponseStatus.GATEWAY_TIMEOUT));
         }
     }
 
@@ -81,7 +81,7 @@ public class AsyncRequestRouter extends AsyncRequestReceiver {
         // check http method
         if (httpContext.getRequestMethod() == RequestMethod.UNKOWN) {
             // httpcode 405
-            sendResponse(HttpResponseBuilder.create(HttpResponseStatus.METHOD_NOT_ALLOWED));
+            sendResponse(HttpResponseBuilder.create(httpContext, HttpResponseStatus.METHOD_NOT_ALLOWED));
             return false;
         }
 
@@ -94,7 +94,7 @@ public class AsyncRequestRouter extends AsyncRequestReceiver {
         URLController controller;
         if ((controller = controllerRouter.findURLController(resource)) == null) {
             // httpcode 404
-            sendResponse(HttpResponseBuilder.create(HttpResponseStatus.NOT_FOUND));
+            sendResponse(HttpResponseBuilder.create(httpContext, HttpResponseStatus.NOT_FOUND));
             HttpServerStats.incrRequestMiss();
             return null;
         }
@@ -127,7 +127,7 @@ public class AsyncRequestRouter extends AsyncRequestReceiver {
                 e.printStackTrace();
                 HttpServerStats.setLastServFailID(httpContext.getRequestId());
                 // httpcode 503
-                sendResponse(HttpResponseBuilder.create(HttpResponseStatus.SERVICE_UNAVAILABLE));
+                sendResponse(HttpResponseBuilder.create(httpContext, HttpResponseStatus.SERVICE_UNAVAILABLE));
             }
         });
     }

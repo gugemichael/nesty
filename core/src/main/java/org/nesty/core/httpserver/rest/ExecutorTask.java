@@ -20,15 +20,15 @@ import java.util.concurrent.Callable;
  */
 public class ExecutorTask implements Callable<DefaultFullHttpResponse> {
 
-    // http context used for controller invoking
-    private final HttpContext context;
+    // httpContext used for controller invoking
+    private final HttpContext httpContext;
     // related controller
     private final URLController handler;
     // interceptor list
     private final List<HttpInterceptor> interceptor;
 
-    public ExecutorTask(HttpContext context, List<HttpInterceptor> interceptor, URLController handler) {
-        this.context = context;
+    public ExecutorTask(HttpContext httpContext, List<HttpInterceptor> interceptor, URLController handler) {
+        this.httpContext = httpContext;
         this.interceptor = interceptor;
         this.handler = handler;
     }
@@ -37,12 +37,12 @@ public class ExecutorTask implements Callable<DefaultFullHttpResponse> {
     public DefaultFullHttpResponse call() {
         // call interceptor chain of recvRequest
         for (HttpInterceptor every : interceptor) {
-            if (!every.recvRequest(context))
-                return HttpResponseBuilder.create(HttpResponseStatus.FORBIDDEN);        // httpcode 403
+            if (!every.recvRequest(httpContext))
+                return HttpResponseBuilder.create(httpContext, HttpResponseStatus.FORBIDDEN);        // httpcode 403
         }
 
         // call controller method
-        HttpResponse result = handler.call(context);
+        HttpResponse result = handler.call(httpContext);
 
         DefaultFullHttpResponse response;
 
@@ -50,29 +50,29 @@ public class ExecutorTask implements Callable<DefaultFullHttpResponse> {
         case SUCCESS:
             if (result.getHttpContent() != null) {
                 ByteBuf content = Unpooled.wrappedBuffer(SerializeUtils.encode(result.getHttpContent()));
-                response = HttpResponseBuilder.create(content);                                              // httpcode 200
+                response = HttpResponseBuilder.create(httpContext, content);                                              // httpcode 200
             } else
-                response = HttpResponseBuilder.create(HttpResponseStatus.NO_CONTENT);          // httpcode 204
+                response = HttpResponseBuilder.create(httpContext, HttpResponseStatus.NO_CONTENT);          // httpcode 204
             break;
         case RESPONSE_NOT_VALID:
-            response = HttpResponseBuilder.create(HttpResponseStatus.BAD_GATEWAY);            // httpcode 502
+            response = HttpResponseBuilder.create(httpContext, HttpResponseStatus.BAD_GATEWAY);            // httpcode 502
             break;
         case PARAMS_CONVERT_ERROR:
         case PARAMS_NOT_MATCHED:
-            response = HttpResponseBuilder.create(HttpResponseStatus.BAD_REQUEST);             // httpcode 400
+            response = HttpResponseBuilder.create(httpContext, HttpResponseStatus.BAD_REQUEST);             // httpcode 400
             break;
         case SYSTEM_ERROR:
-            response = HttpResponseBuilder.create(HttpResponseStatus.INTERNAL_SERVER_ERROR);    // httpcode 500
+            response = HttpResponseBuilder.create(httpContext, HttpResponseStatus.INTERNAL_SERVER_ERROR);    // httpcode 500
             break;
         default:
-            response = HttpResponseBuilder.create(HttpResponseStatus.INTERNAL_SERVER_ERROR);    // httpcode 500
+            response = HttpResponseBuilder.create(httpContext, HttpResponseStatus.INTERNAL_SERVER_ERROR);    // httpcode 500
             break;
         }
 
         // call interceptor chain of sendResponse. returned DefaultFullHttpResponse
         // will be replaced to original instance
         for (HttpInterceptor every : interceptor) {
-            DefaultFullHttpResponse newResponse = every.sendResponse(context, response);
+            DefaultFullHttpResponse newResponse = every.sendResponse(httpContext, response);
             if (newResponse != null)
                 response = newResponse;
         }
