@@ -7,7 +7,7 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import org.nesty.commons.utils.SerializeUtils;
 import org.nesty.core.httpserver.rest.controller.URLController;
 import org.nesty.core.httpserver.rest.interceptor.HttpInterceptor;
-import org.nesty.core.httpserver.rest.response.HttpResponse;
+import org.nesty.core.httpserver.rest.response.HttpResult;
 import org.nesty.core.httpserver.rest.response.HttpResponseBuilder;
 
 import java.util.List;
@@ -42,7 +42,7 @@ public class ExecutorTask implements Callable<DefaultFullHttpResponse> {
         }
 
         // call controller method
-        HttpResponse result = handler.call(httpContext);
+        HttpResult result = handler.call(httpContext);
 
         DefaultFullHttpResponse response;
 

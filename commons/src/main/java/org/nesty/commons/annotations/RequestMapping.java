@@ -13,6 +13,6 @@ import java.lang.annotation.Target;
 public @interface RequestMapping {
     String value();
     RequestMethod method() default RequestMethod.GET;
-    String consumes() default HttpConstants.CONTENT_TYPE_JSON;
-    String produces() default HttpConstants.CONTENT_TYPE_TEXT;
+    String consumes() default HttpConstants.HEADER_CONTENT_TYPE_JSON;
+    String produces() default HttpConstants.HEADER_CONTENT_TYPE_TEXT;
 }

@@ -11,14 +11,14 @@ import org.nesty.commons.utils.SerializeUtils;
 import org.nesty.core.httpserver.rest.HttpContext;
 
 /**
- * Build an HttpResponse
+ * Build an DefaultFullHttpResponse {@link DefaultFullHttpResponse}
  *
  * [Author] Michael
  * [Date] March 04, 2016
  */
 public class HttpResponseBuilder {
 
-    // if no content in HttpResponse we will fill empty body
+    // if no content in DefaultFullHttpResponse we will fill empty body
     private static final byte[] uselessBuffer = SerializeUtils.encode(new EMPTY());
 
     public static DefaultFullHttpResponse create(HttpContext httpContext, HttpResponseStatus status) {

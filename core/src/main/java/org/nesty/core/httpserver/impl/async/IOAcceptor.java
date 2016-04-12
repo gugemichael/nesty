@@ -91,7 +91,6 @@ public class IOAcceptor {
     public void join() throws InterruptedException {
         // sync waitting until the server socket is closed.
         serverSocket.channel().closeFuture().sync();
-
     }
 
     public void shutdown() {
