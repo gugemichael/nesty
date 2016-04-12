@@ -1,5 +1,7 @@
 package org.nesty.core.httpserver.rest;
 
+import io.netty.handler.codec.http.HttpVersion;
+import org.nesty.commons.constant.http.HttpConstants;
 import org.nesty.commons.constant.http.RequestMethod;
 import org.nesty.core.httpserver.rest.request.HttpRequestVisitor;
 
@@ -27,20 +29,22 @@ public class HttpContext extends HttpSession {
     // ip address from origin client, fetch it from getRemoteAddr()
     // or header X-FORWARDED-FOR
     private String remoteAddress;
-    //  raw url exclude query string
-    private String url;
+    //  raw uri exclude query string
+    private String uri;
     // http uri terms split by "/"
     private String[] terms;
     // Http request method. NOT null
     private RequestMethod requestMethod;
+    // Http long connection
+    private boolean isKeepAlive = true;
 
-    protected HttpContext() {
+    private HttpContext() {
     }
 
     public static HttpContext build(HttpRequestVisitor visitor) {
         HttpContext context = new HttpContext();
         context.remoteAddress = visitor.visitRemoteAddress();
-        context.url = visitor.visitURL();
+        context.uri = visitor.visitURI();
         context.terms = visitor.visitTerms();
         context.requestMethod = visitor.visitHttpMethod();
         context.httpHeaders = visitor.visitHttpHeaders();
@@ -50,15 +54,27 @@ public class HttpContext extends HttpSession {
         //
         context.httpBody = visitor.visitHttpBody();
 
+        if (visitor.visitHttpVersion() == HttpVersion.HTTP_1_1 &&
+                HttpConstants.HEADER_CONNECTION_CLOSE.equals(context.httpHeaders.get(HttpConstants.HEADER_CONNECTION)))
+            context.isKeepAlive = false;
+
+        if (visitor.visitHttpVersion() == HttpVersion.HTTP_1_0 &&
+                !HttpConstants.HEADER_CONNECTION_KEEPALIVE.equalsIgnoreCase(context.httpHeaders.get(HttpConstants.HEADER_CONNECTION)))
+            context.isKeepAlive = false;
+
         return context;
+    }
+
+    public boolean isKeepAlive() {
+        return isKeepAlive;
     }
 
     public String getRemoteAddress() {
         return remoteAddress;
     }
 
-    public String getUrl() {
-        return url;
+    public String getUri() {
+        return uri;
     }
 
     public String[] getTerms() {

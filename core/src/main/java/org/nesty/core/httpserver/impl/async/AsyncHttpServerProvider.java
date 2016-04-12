@@ -3,21 +3,18 @@ package org.nesty.core.httpserver.impl.async;
 import org.nesty.core.httpserver.HttpServerRouteProvider;
 
 /**
- * nesty
+ * Async http server in netty eventloop
  *
  * Author Michael on 03/03/2016.
  */
 public class AsyncHttpServerProvider extends HttpServerRouteProvider {
 
-    /**
-     * http protocol acceptor
-     */
+    // http protocol acceptor
     private final IOAcceptor ioAcceptor;
 
-    public AsyncHttpServerProvider(String address, int port) {
+    private AsyncHttpServerProvider(String address, int port) {
         this.ioAcceptor = new IOAcceptor(this, address, port);
     }
-
 
     public static AsyncHttpServerProvider create(String address, Integer port) {
         return new AsyncHttpServerProvider(address, port);

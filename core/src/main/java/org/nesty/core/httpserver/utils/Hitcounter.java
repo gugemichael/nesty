@@ -2,7 +2,7 @@ package org.nesty.core.httpserver.utils;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-public class Countable {
+public class Hitcounter {
 
     private final AtomicLong counter = new AtomicLong();
 

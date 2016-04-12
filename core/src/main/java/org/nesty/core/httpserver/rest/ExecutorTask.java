@@ -5,9 +5,8 @@ import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import org.nesty.commons.utils.SerializeUtils;
-import org.nesty.core.httpserver.rest.HttpContext;
-import org.nesty.core.httpserver.rest.interceptor.HttpInterceptor;
 import org.nesty.core.httpserver.rest.controller.URLController;
+import org.nesty.core.httpserver.rest.interceptor.HttpInterceptor;
 import org.nesty.core.httpserver.rest.response.HttpResponse;
 import org.nesty.core.httpserver.rest.response.HttpResponseBuilder;
 
@@ -21,8 +20,11 @@ import java.util.concurrent.Callable;
  */
 public class ExecutorTask implements Callable<DefaultFullHttpResponse> {
 
-    private final URLController handler;
+    // http context used for controller invoking
     private final HttpContext context;
+    // related controller
+    private final URLController handler;
+    // interceptor list
     private final List<HttpInterceptor> interceptor;
 
     public ExecutorTask(HttpContext context, List<HttpInterceptor> interceptor, URLController handler) {
@@ -48,16 +50,16 @@ public class ExecutorTask implements Callable<DefaultFullHttpResponse> {
         case SUCCESS:
             if (result.getHttpContent() != null) {
                 ByteBuf content = Unpooled.wrappedBuffer(SerializeUtils.encode(result.getHttpContent()));
-                response = HttpResponseBuilder.create(content);                         // httpcode 200
+                response = HttpResponseBuilder.create(content);                                              // httpcode 200
             } else
-                response = HttpResponseBuilder.create(HttpResponseStatus.NO_CONTENT);       // httpcode 204
+                response = HttpResponseBuilder.create(HttpResponseStatus.NO_CONTENT);          // httpcode 204
             break;
         case RESPONSE_NOT_VALID:
-            response = HttpResponseBuilder.create(HttpResponseStatus.BAD_GATEWAY);        // httpcode 502
+            response = HttpResponseBuilder.create(HttpResponseStatus.BAD_GATEWAY);            // httpcode 502
             break;
         case PARAMS_CONVERT_ERROR:
         case PARAMS_NOT_MATCHED:
-            response = HttpResponseBuilder.create(HttpResponseStatus.BAD_REQUEST);         // httpcode 400
+            response = HttpResponseBuilder.create(HttpResponseStatus.BAD_REQUEST);             // httpcode 400
             break;
         case SYSTEM_ERROR:
             response = HttpResponseBuilder.create(HttpResponseStatus.INTERNAL_SERVER_ERROR);    // httpcode 500
@@ -67,7 +69,8 @@ public class ExecutorTask implements Callable<DefaultFullHttpResponse> {
             break;
         }
 
-        // call interceptor chain of sendResponse
+        // call interceptor chain of sendResponse. returned DefaultFullHttpResponse
+        // will be replaced to original instance
         for (HttpInterceptor every : interceptor) {
             DefaultFullHttpResponse newResponse = every.sendResponse(context, response);
             if (newResponse != null)

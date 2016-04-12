@@ -26,25 +26,32 @@ import java.util.List;
  */
 public abstract class HttpServerRouteProvider extends HttpServerProvider {
 
-    private static final ControllerRouter CONTROLLER_ROUTER = new ControllerRouter();
-
-    private static final List<HttpInterceptor> interceptor = new LinkedList<>();
+    // controller router map collection
+    private static final ControllerRouter routerTable = new ControllerRouter();
+    // interceptors collection
+    private static final List<HttpInterceptor> interceptors = new LinkedList<>();
+    // http URI root path
+    private static final String ROOT_PATH = "/";
 
     static {
 
         // default Interceptor
-        interceptor.add(new DefaultInterceptor());
+        interceptors.add(new DefaultInterceptor());
 
         // default Controller (URI path is "/")
         Method root = DefaultController.class.getMethods()[0];
-        CONTROLLER_ROUTER.register(URLResource.fromHttp("/", RequestMethod.GET), URLController.fromProvider("/", DefaultController.class, root).internal());
+        routerTable.register(URLResource.fromHttp(ROOT_PATH, RequestMethod.GET), URLController.fromProvider(ROOT_PATH, DefaultController.class, root).internal());
     }
 
-    /**
-     * scan specified package's all classes
-     */
+    // scan specified package's all classes
     private PackageScanner scanner = new PackageScanner();
 
+    public static void disableInternalController() {
+        routerTable.unregister(URLResource.fromHttp(ROOT_PATH, RequestMethod.GET));
+    }
+
+    // scan package controller class. NOT Threads-Safe !!
+    //
     public HttpServerRouteProvider scanHttpController(String packageName) throws ControllerRequestMappingException {
         // find all Class
         List<Class<?>> classList = null;
@@ -74,7 +81,7 @@ public abstract class HttpServerRouteProvider extends HttpServerProvider {
                      * TODO : may be we can indecate the previous {@link Interceptor} manully
                      *
                      */
-                    interceptor.add((HttpInterceptor) clazz.newInstance());
+                    interceptors.add((HttpInterceptor) clazz.newInstance());
                 } catch (InstantiationException | IllegalAccessException e) {
                     throw new ControllerRequestMappingException(String.format("%s newInstance() failed %s", clazz.getName(), e.getMessage()));
                 }
@@ -120,11 +127,11 @@ public abstract class HttpServerRouteProvider extends HttpServerProvider {
                      * TODO : we throw exception here. let users to know and decide what to do
                      *
                      */
-                    if (!CONTROLLER_ROUTER.register(urlResource, urlController))
+                    if (!routerTable.register(urlResource, urlController))
                         throw new ControllerRequestMappingException(String.format("%s.%s annotation is duplicated", clazz.getName(), method.getName()));
 
                     // add monitor
-                    HttpServerStats.RESOURCES.put(urlResource, urlController);
+                    HttpServerStats.resourceMap.put(urlResource, urlController);
                 }
             }
         }
@@ -139,10 +146,10 @@ public abstract class HttpServerRouteProvider extends HttpServerProvider {
     }
 
     public ControllerRouter getRouteController() {
-        return CONTROLLER_ROUTER;
+        return routerTable;
     }
 
     public List<HttpInterceptor> getInterceptor() {
-        return interceptor;
+        return interceptors;
     }
 }

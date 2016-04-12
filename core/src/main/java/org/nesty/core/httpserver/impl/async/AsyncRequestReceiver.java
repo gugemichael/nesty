@@ -18,19 +18,11 @@ import java.util.List;
  */
 public abstract class AsyncRequestReceiver extends SimpleChannelInboundHandler<FullHttpRequest> {
 
-    /**
-     * resource controller route mapping
-     */
+    // resource controller route mapping
     protected static volatile ControllerRouter controllerRouter;
-
-    /**
-     * resource controller route mapping
-     */
+    // resource controller route mapping
     protected static volatile List<HttpInterceptor> interceptor;
-
-    /**
-     * Async workers
-     */
+    // Async workers
     protected static volatile ListeningExecutorService taskWorkerPool;
 
     public static void newTaskPool(int workers) {
@@ -48,16 +40,12 @@ public abstract class AsyncRequestReceiver extends SimpleChannelInboundHandler<F
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         super.channelActive(ctx);
-        HttpServerStats.CONNECTIONS.incrementAndGet();
+        HttpServerStats.incrConnections();
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         super.channelInactive(ctx);
-        HttpServerStats.CONNECTIONS.decrementAndGet();
-    }
-
-    @Override
-    protected void channelRead0(ChannelHandlerContext channelHandlerContext, FullHttpRequest fullHttpRequest) throws Exception {
+        HttpServerStats.decrConnections();
     }
 }

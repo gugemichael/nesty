@@ -22,15 +22,15 @@ public class ControllerRouter {
     private final URLMapper[][] mapper = new URLMapper[RequestMethod.UNKOWN.ordinal()][512];
 
     /**
-     * get specified resource's handler or null if it don't exist
+     * get specified resource's controller or null if it don't exist
      *
      * @param resource url anaylzed resource
-     * @return handler instance or null if it don't exist
+     * @return controller instance or null if it don't exist
      */
-    public URLController findURLControlloer(URLResource resource) {
+    public URLController findURLController(URLResource resource) {
         try {
             // we have checked the request method is supportted!. couldn't index overflow
-            URLMapper slot = mapper[resource.getRequestMethod().ordinal()][resource.getFragments().size()];
+            URLMapper slot = mapper[resource.requestMethod().ordinal()][resource.fragments().size()];
             if (slot != null)
                 return slot.get(resource);
         } catch (ArrayIndexOutOfBoundsException ignored) {
@@ -39,23 +39,42 @@ public class ControllerRouter {
         return null;
     }
 
-    public synchronized boolean register(URLResource resource, URLController handler) {
-        int httpMethodIndex = resource.getRequestMethod().ordinal();
-        int termsIndex = resource.getFragments().size();
-        if (mapper[httpMethodIndex][termsIndex] == null)
-            mapper[httpMethodIndex][termsIndex] = new URLMapper();
-        return mapper[httpMethodIndex][termsIndex].register(resource, handler);
+    public synchronized boolean register(URLResource resource, URLController controller) {
+        Indexer indexer = new Indexer(resource);
+        if (mapper[indexer.HttpMethodIndex][indexer.TermsIndex] == null)
+            mapper[indexer.HttpMethodIndex][indexer.TermsIndex] = new URLMapper();
+        return mapper[indexer.HttpMethodIndex][indexer.TermsIndex].register(resource, controller);
     }
 
-    class URLMapper {
+    public synchronized void unregister(URLResource resource) {
+        Indexer indexer = new Indexer(resource);
+        if (mapper[indexer.HttpMethodIndex][indexer.TermsIndex] != null)
+            mapper[indexer.HttpMethodIndex][indexer.TermsIndex].unregister(resource);
+    }
+
+    static class Indexer {
+        public int HttpMethodIndex;
+        public int TermsIndex;
+
+        public Indexer(URLResource resource) {
+            HttpMethodIndex = resource.requestMethod().ordinal();
+            TermsIndex = resource.fragments().size();
+        }
+    }
+
+    static class URLMapper {
         private final Map<URLResource, URLController> controller = new ConcurrentHashMap<URLResource, URLController>(256);
 
         public URLController get(URLResource resource) {
             return controller.get(resource);
         }
 
-        public boolean register(URLResource resource, URLController handler) {
-            return controller.put(resource, handler) == null;
+        public boolean register(URLResource resource, URLController controller) {
+            return this.controller.put(resource, controller) == null;
+        }
+
+        public void unregister(URLResource resource) {
+            controller.remove(resource);
         }
     }
 }

@@ -4,6 +4,7 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.FluentIterable;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.util.CharsetUtil;
 import org.nesty.commons.constant.http.HttpConstants;
@@ -79,7 +80,7 @@ public class NettyHttpRequestVisitor implements HttpRequestVisitor {
     }
 
     @Override
-    public String visitURL() {
+    public String visitURI() {
         return request.getUri();
     }
 
@@ -87,5 +88,10 @@ public class NettyHttpRequestVisitor implements HttpRequestVisitor {
     public String[] visitTerms() {
         String termsUrl = HttpUtils.truncateUrl(request.getUri());
         return FluentIterable.from(Splitter.on('/').omitEmptyStrings().trimResults().split(termsUrl)).toArray(String.class);
+    }
+
+    @Override
+    public HttpVersion visitHttpVersion() {
+        return request.getProtocolVersion();
     }
 }

@@ -14,14 +14,14 @@ public class DefaultController {
     @RequestMapping("/")
     public RootResponse root() {
         RootResponse response = new RootResponse();
-        response.REQUESTS_MISS = HttpServerStats.REQUESTS_MISS.get();
-        response.REQUEST_HITS = HttpServerStats.REQUESTS_HIT.get();
-        response.CONNECTIONS = HttpServerStats.CONNECTIONS.get();
-        response.LAST_SERV_TIME = HttpServerStats.LAST_SERV_TIME;
-        response.LAST_SERV_ID = HttpServerStats.LAST_SERV_ID;
-        response.LAST_SERV_FAIL_ID = HttpServerStats.LAST_SERV_FAIL_ID;
+        response.REQUESTS_MISS = HttpServerStats.getRequestMiss();
+        response.REQUEST_HITS = HttpServerStats.getRequestHit();
+        response.CONNECTIONS = HttpServerStats.getConnections();
+        response.LAST_SERV_TIME = HttpServerStats.getLastServTime();
+        response.LAST_SERV_ID = HttpServerStats.getLastServID();
+        response.LAST_SERV_FAIL_ID = HttpServerStats.getLastServFailID();
 
-        for (Map.Entry<URLResource, URLController> entry : HttpServerStats.RESOURCES.entrySet())
+        for (Map.Entry<URLResource, URLController> entry : HttpServerStats.getResourcesMap().entrySet())
             response.RESOURCES_HITS.put(entry.getKey().toString(), entry.getValue().count());
 
         return response;

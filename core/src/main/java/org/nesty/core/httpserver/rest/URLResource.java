@@ -9,17 +9,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * nesty
+ * Represent one URI resource. include http uri and http method
  *
  * Author Michael on 03/03/2016.
  */
 public class URLResource {
 
+    // variable flag
     public static final char VARIABLE = '{';
-
+    // resource identifier
     private URLResourceIdentifier identifier;
 
     private URLResource() {
+
     }
 
     public static URLResource fromHttp(String url, RequestMethod requestMethod) {
@@ -29,11 +31,11 @@ public class URLResource {
         return resource;
     }
 
-    public RequestMethod getRequestMethod() {
+    public RequestMethod requestMethod() {
         return identifier.requestMethod;
     }
 
-    public List<String> getFragments() {
+    public List<String> fragments() {
         return identifier.fragments;
     }
 

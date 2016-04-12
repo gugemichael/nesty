@@ -1,5 +1,6 @@
 package org.nesty.core.httpserver.rest.request;
 
+import io.netty.handler.codec.http.HttpVersion;
 import org.nesty.commons.constant.http.RequestMethod;
 
 import java.util.Map;
@@ -12,7 +13,7 @@ import java.util.Map;
 public interface HttpRequestVisitor {
     String visitRemoteAddress();
 
-    String visitURL();
+    String visitURI();
 
     String[] visitTerms();
 
@@ -23,4 +24,6 @@ public interface HttpRequestVisitor {
     Map<String, String> visitHttpParams();
 
     Map<String, String> visitHttpHeaders();
+
+    HttpVersion visitHttpVersion();
 }

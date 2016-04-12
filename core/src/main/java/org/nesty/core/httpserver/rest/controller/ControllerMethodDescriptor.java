@@ -1,17 +1,17 @@
 package org.nesty.core.httpserver.rest.controller;
 
-import org.nesty.commons.annotations.RequestBody;
 import org.nesty.commons.annotations.Header;
 import org.nesty.commons.annotations.PathVariable;
+import org.nesty.commons.annotations.RequestBody;
 import org.nesty.commons.annotations.RequestParam;
 import org.nesty.commons.exception.ControllerParamsNotMatchException;
 import org.nesty.commons.exception.ControllerParamsParsedException;
 import org.nesty.commons.exception.SerializeException;
 import org.nesty.commons.utils.SerializeUtils;
-import org.nesty.core.httpserver.rest.controller.ControllerMethodDescriptor.MethodParams.AnnotationType;
 import org.nesty.core.httpserver.rest.HttpContext;
 import org.nesty.core.httpserver.rest.HttpSession;
 import org.nesty.core.httpserver.rest.URLResource;
+import org.nesty.core.httpserver.rest.controller.ControllerMethodDescriptor.MethodParams.AnnotationType;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -29,8 +29,10 @@ public class ControllerMethodDescriptor {
     private Method method;
     // method param include param class type and param annotation
     private MethodParams[] params;
+    // target instance
+    private Object target;
 
-    public ControllerMethodDescriptor(String URI, Method method) {
+    public ControllerMethodDescriptor(String URI, ControllerClassDescriptor clazz, Method method) {
         this.method = method;
 
         String key, value;
@@ -78,16 +80,21 @@ public class ControllerMethodDescriptor {
                 }
             }
         }
+
+        try {
+            target = clazz.getClazz().newInstance();
+        } catch (InstantiationException | IllegalAccessException ignored) {
+            ignored.printStackTrace();
+        }
     }
 
-    public Object invoke(ControllerClassDescriptor clazz, HttpContext context) throws ControllerParamsNotMatchException, ControllerParamsParsedException {
+    public Object invoke(HttpContext context) throws ControllerParamsNotMatchException, ControllerParamsParsedException {
         try {
-            Object target = clazz.getClazz().newInstance();
             if (params != null)
                 return method.invoke(target, resolveParams(context));
             else
                 return method.invoke(target);
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+        } catch (IllegalAccessException | InvocationTargetException e) {
 
             /**
              * TODO : we suppose there is no exception on newInstance() and invoke()
@@ -98,7 +105,7 @@ public class ControllerMethodDescriptor {
             if (e instanceof InvocationTargetException)
                 throw new RuntimeException(e.getMessage());
             else
-                throw new ControllerParamsNotMatchException(String.format("invoke %s.%s throw exception %s", clazz.getClass().getName(), method.getName(), e.getMessage()));
+                throw new ControllerParamsNotMatchException(String.format("invoke controller %s() occur exception %s", method.getName(), e.getMessage()));
         }
     }
 
