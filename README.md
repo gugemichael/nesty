@@ -2,14 +2,16 @@
 Http RESTful Api implemention on Netty async io
 
 ## Lastest version
-0.2.0
+0.0.2
 
 changeslog 
-0.2.0
-	* support http long connection(Connection: keep-alive)
-	* support root path (uri path is /) stats and counter information
-0.1.0 
-	* original snapshot version
+
+0.0.2
+* support http long connection(Connection: keep-alive)
+* support root path (uri path is /) stats and counter information
+
+0.0.1 
+* original snapshot version
 
 ## Features
 
