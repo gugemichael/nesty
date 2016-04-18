@@ -51,6 +51,18 @@ Class | null | from http body serializer parsed
 * Simplest http server
 
 ```java
+public class SimpleHttpServer {
+
+	public static void main(String[] args) throws ControllerRequestMappingException {
+		AsyncServerProvider.builder().port(8080).service(NestyProtocol.HTTP)
+			.scanHttpController("org.nesty.example.httpserver.handler").start();
+	}
+}
+```
+
+* Normal http server
+
+```java
 
 public static void main(String[] args) {
 
@@ -78,8 +90,6 @@ public static void main(String[] args) {
 		server.shutdown();
 	} catch (InterruptedException ignored) {
 	}
-
-    // would not to reach here as usual ......
 }
 ```
 
