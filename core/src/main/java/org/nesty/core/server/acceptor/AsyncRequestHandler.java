@@ -26,7 +26,7 @@ import org.nesty.core.server.rest.response.HttpResponseBuilder;
 public class AsyncRequestHandler extends AsyncRequestReceiver {
 
     // Http context
-    HttpContext httpContext;
+    private volatile HttpContext httpContext;
     // channel context
     private ChannelHandlerContext context;
 
@@ -50,7 +50,7 @@ public class AsyncRequestHandler extends AsyncRequestReceiver {
         if (cause instanceof ReadTimeoutException) {
             // httpcode 504
             if (context.channel().isOpen())
-                sendResponse(HttpResponseBuilder.create(httpContext, HttpResponseStatus.GATEWAY_TIMEOUT));
+                sendResponse(httpContext, HttpResponseBuilder.create(httpContext, HttpResponseStatus.GATEWAY_TIMEOUT));
         }
     }
 
@@ -74,14 +74,14 @@ public class AsyncRequestHandler extends AsyncRequestReceiver {
          *
          */
         if (controller != null)
-            executeAsyncTask(controller);
+            execute(controller);
     }
 
     private boolean checkup() {
         // check http method
         if (httpContext.getRequestMethod() == RequestMethod.UNKOWN) {
             // httpcode 405
-            sendResponse(HttpResponseBuilder.create(httpContext, HttpResponseStatus.METHOD_NOT_ALLOWED));
+            sendResponse(httpContext, HttpResponseBuilder.create(httpContext, HttpResponseStatus.METHOD_NOT_ALLOWED));
             return false;
         }
 
@@ -94,7 +94,7 @@ public class AsyncRequestHandler extends AsyncRequestReceiver {
         URLController controller;
         if ((controller = controllerRouter.findURLController(resource)) == null) {
             // httpcode 404
-            sendResponse(HttpResponseBuilder.create(httpContext, HttpResponseStatus.NOT_FOUND));
+            sendResponse(httpContext, HttpResponseBuilder.create(httpContext, HttpResponseStatus.NOT_FOUND));
             NestyServerMonitor.incrRequestMiss();
             return null;
         }
@@ -107,36 +107,55 @@ public class AsyncRequestHandler extends AsyncRequestReceiver {
         return controller;
     }
 
-    private void executeAsyncTask(URLController controller) {
+    private void execute(URLController controller) {
         if (!controller.isInternal()) {
             NestyServerMonitor.setLastServTime(System.currentTimeMillis());
             NestyServerMonitor.setLastServID(httpContext.getRequestId());
         }
 
-        // build logic task
-        ExecutorTask task = new ExecutorTask(httpContext, interceptor, controller);
+        // if IOWorker pool is empty. we use this same thread directly.
+        // no more context switch (queue pop/push cause) happen here !
+        if (ioWorker == null) {
+            try {
+                sendResponse(httpContext, new ExecutorTask(httpContext, interceptor, controller).call());
+            } catch (Throwable e) {
+                e.printStackTrace();
+                sendResponse(httpContext, failure());
+            }
+            return;
+        }
+
+        executeAsyncTask(new ExecutorTask(httpContext, interceptor, controller));
+    }
+
+    private void executeAsyncTask(ExecutorTask task) {
+        final HttpContext currentContext = httpContext;
 
         Futures.addCallback(ioWorker.submit(task), new FutureCallback<DefaultFullHttpResponse>() {
             @Override
             public void onSuccess(DefaultFullHttpResponse resp) {
-                sendResponse(resp);
+                sendResponse(currentContext, resp);
             }
 
             @Override
             public void onFailure(Throwable e) {
                 e.printStackTrace();
-                NestyServerMonitor.setLastServFailID(httpContext.getRequestId());
-                // httpcode 503
-                sendResponse(HttpResponseBuilder.create(httpContext, HttpResponseStatus.SERVICE_UNAVAILABLE));
+                sendResponse(currentContext, failure());
             }
         });
     }
 
-    private void sendResponse(DefaultFullHttpResponse response) {
+    private DefaultFullHttpResponse failure() {
+        NestyServerMonitor.setLastServFailID(httpContext.getRequestId());
+        // httpcode 503
+        return HttpResponseBuilder.create(httpContext, HttpResponseStatus.SERVICE_UNAVAILABLE);
+    }
+
+    private void sendResponse(HttpContext ctx, DefaultFullHttpResponse response) {
         ChannelFuture future = context.channel().writeAndFlush(response);
 
         // http short connection
-        if (!httpContext.isKeepAlive())
+        if (!ctx.isKeepAlive())
             future.addListener(ChannelFutureListener.CLOSE);
     }
 }

@@ -26,7 +26,8 @@ public abstract class AsyncRequestReceiver extends SimpleChannelInboundHandler<F
     protected static volatile ListeningExecutorService ioWorker;
 
     public static void newTaskPool(int workers) {
-        ioWorker = MoreExecutors.listeningDecorator(IoWorker.newExecutors(workers));
+        if (workers >= 0)
+            ioWorker = MoreExecutors.listeningDecorator(IoWorker.newExecutors(workers));
     }
 
     public static void useURLResourceController(ControllerRouter routeControllerMap) {
