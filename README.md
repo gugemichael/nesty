@@ -54,29 +54,30 @@ Class | null | from http body serializer parsed
 
 public static void main(String[] args) {
 
-    // 1. create httpserver
-    HttpServerRouteProvider server = AsyncHttpServerProvider.create("127.0.0.1", 8080);
+	// 1. build httpserver
+	NestyServer server = AsyncServerProvider.builder().port(8080).service(NestyProtocol.HTTP);
 
-    // 2. choose http params. this is unnecessary
-    server.useOptions(new HttpServerOptions().setMaxConnections(4096)
-                                            .setHandlerTimeout(10000)
-                                            .setIoThreads(8)
-                                            .setHandlerThreads(256));
+	// 2. choose http params. this is unnecessary
+	server.option(NestyOptions.IO_THREADS, Runtime.getRuntime().availableProcessors())
+		  .option(NestyOptions.WORKER_THREADS, 128)
+		  .option(NestyOptions.TCP_BACKLOG, 1024)
+		  .option(NestyOptions.TCP_NODELAY, true);
 
-    server.scanHttpController("com.nesty.test.neptune")
-            .scanHttpController("com.nesty.test.billing")
-            .scanHttpController("org.nesty.example.httpserver.handler");
+	// 3. scan defined controller class with package name
+	server.scanHttpController("com.nesty.test.neptune")
+		  .scanHttpController("com.nesty.test.billing")
+		  .scanHttpController("org.nesty.example.httpserver.handler");
 
-    // 3. start http server
-    if (!server.start())
-        System.err.println("HttpServer run failed");
+	// 4. start http server
+	if (!server.start())
+		System.err.println("NestServer run failed");
 
-    try {
-        // join and wait here
-        server.join();
-        server.shutdown();
-    } catch (InterruptedException ignored) {
-    }
+	try {
+		// join and wait here
+		server.join();
+		server.shutdown();
+	} catch (InterruptedException ignored) {
+	}
 
     // would not to reach here as usual ......
 }
