@@ -1,37 +1,35 @@
 package org.nesty.example.httpserver;
 
 import org.nesty.commons.exception.ControllerRequestMappingException;
-import org.nesty.core.httpserver.HttpServerOptions;
-import org.nesty.core.httpserver.HttpServerRouteProvider;
-import org.nesty.core.httpserver.impl.async.AsyncHttpServerProvider;
+import org.nesty.core.server.NestyOptions;
+import org.nesty.core.server.NestyServer;
+import org.nesty.core.server.acceptor.AsyncServerProvider;
+import org.nesty.core.server.protocol.NestyProtocol;
 
 public class SimpleHttpServer {
 
-    public static void main(String[] args) throws ControllerRequestMappingException {
+    public static void main(String[] args) throws ControllerRequestMappingException, InterruptedException {
 
         // 1. create httpserver
-        HttpServerRouteProvider server = AsyncHttpServerProvider.create("127.0.0.1", 8080);
+        NestyServer server = AsyncServerProvider.builder().address("127.0.0.1").port(8080)
+                                                                        .service(NestyProtocol.HTTP);
 
         // 2. choose http params. this is unnecessary
-        server.useOptions(new HttpServerOptions().setMaxConnections(4096)
-                                                .setHandlerTimeout(10000)
-                                                .setIoThreads(8)
-                                                .setHandlerThreads(256));
+        server.option(NestyOptions.IO_THREADS, Runtime.getRuntime().availableProcessors())
+                .option(NestyOptions.WORKER_THREADS, 128)
+                .option(NestyOptions.TCP_BACKLOG, 1024)
+                .option(NestyOptions.TCP_NODELAY, true);
 
+        // 3. scan defined controller class with package name
         server.scanHttpController("com.nesty.test.neptune")
                 .scanHttpController("com.nesty.test.billing")
                 .scanHttpController("org.nesty.example.httpserver.handler");
 
-        // 3. start http server
+        // 4. start http server
         if (!server.start())
-            System.err.println("HttpServer run failed");
+            System.err.println("NestServer run failed");
 
-        try {
-            // join and wait here
-            server.join();
-            server.shutdown();
-        } catch (InterruptedException ignored) {
-        }
+        server.join();
 
         // would not to reach here as usual ......
     }

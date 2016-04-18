@@ -109,6 +109,54 @@ public class ServiceController {
 
 ```
 
+* Interceptor
+
+```java
+@org.nesty.commons.annotations.Interceptor
+public class ServiceInterceptor extends Interceptor {
+
+	@Override
+	public boolean filter(final HttpContext context) {
+
+		// count the request
+		totalRequest.incrementAndGet();
+
+		// show remote address
+		if (!context.getRemoteAddress().isEmpty())
+			System.out.println(String.format("request from client %s", context.getRemoteAddress()));
+
+		// reject some one which is not we want
+		if (context.getRemoteAddress().equals("192.168.1.1"))
+			return false;
+
+		// reject request from agent like curl
+		if (context.getHttpHeaders().containsKey("User-Agent"))
+			return false;
+
+		// OK
+		return true;
+	}   
+
+	@Override
+	public DefaultFullHttpResponse handler(final HttpContext context, DefaultFullHttpResponse response) {
+
+		// compress content if client support
+		if ("gzip".equalsIgnoreCase(context.getHttpHeaders().get("Accept-Encoding"))) {
+			// compress the body
+			ByteBuf compressContent = compressWithGzip(response.content());
+			DefaultFullHttpResponse newResponse = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, compressContent);
+			response = newResponse;
+		}   
+
+		// add more header
+		response.headers().add("NestyInceptor", "Nesty is Good");
+
+		return response;
+	}   
+}
+
+
+
 More examples. Please visit https://github.com/gugemichael/nesty/wiki/More-Examples
 
 ## Threads Model

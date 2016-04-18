@@ -2,7 +2,7 @@ package com.nesty.test.neptune;
 
 import org.nesty.commons.annotations.*;
 import org.nesty.commons.constant.http.RequestMethod;
-import org.nesty.core.httpserver.rest.HttpSession;
+import org.nesty.core.server.rest.HttpSession;
 import org.nesty.example.httpserver.handler.model.ProjectModel;
 
 import java.util.List;
