@@ -10,13 +10,13 @@ import org.nesty.core.server.acceptor.AsyncAcceptor;
  *
  * Author Michael on 03/03/2016.
  */
-public class HttpsAsyncAcceptor extends AsyncAcceptor {
+public class AsyncHttpsAcceptor extends AsyncAcceptor {
 
-    public HttpsAsyncAcceptor(NestyServer nestyServer, String address, int port) {
+    public AsyncHttpsAcceptor(NestyServer nestyServer, String address, int port) {
         super(nestyServer, address, port);
     }
 
-    protected void protocolPipeline(ChannelPipeline pipeline, NestyOptionProvider options) {
+    protected void buildPipeline(ChannelPipeline pipeline, NestyOptionProvider options) {
         throw new RuntimeException("not implement");
     }
 }

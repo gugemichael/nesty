@@ -1,8 +1,8 @@
 package com.nesty.test.neptune;
 
 import org.nesty.commons.annotations.*;
-import org.nesty.commons.constant.http.RequestMethod;
-import org.nesty.core.server.rest.HttpSession;
+import org.nesty.commons.constant.RequestMethod;
+import org.nesty.core.server.rest.Session;
 import org.nesty.example.httpserver.handler.model.ProjectModel;
 
 import java.util.List;
@@ -81,8 +81,8 @@ public class ModelController {
             @RequestParam(value = "projectId", required = false) Long projectId,
             @RequestParam(value = "modelId", required = false) Long modelId,
             @RequestParam(value = "modelName", required = false) String modelName,
-            HttpSession httpSession) {
-        System.out.println(String.format("getModelFeatureAnalysist %d requestId %s", projectId, httpSession.getId()));
+            Session session) {
+        System.out.println(String.format("getModelFeatureAnalysist %d requestId %s", projectId, session.getId()));
         return new ApiResult<Boolean>();
     }
 
@@ -91,8 +91,8 @@ public class ModelController {
     @ResponseBody
     ApiResult<Boolean> renameFolder(
             @RequestParam(value = "projectId", required = false) Long projectId,
-            @RequestBody ProjectModel folderRenameVo, HttpSession httpSession) {
-        System.out.println(String.format("renameFolder %d %s requestId %s", projectId, folderRenameVo.getProjectName(), httpSession.getId()));
+            @RequestBody ProjectModel folderRenameVo, Session session) {
+        System.out.println(String.format("renameFolder %d %s requestId %s", projectId, folderRenameVo.getProjectName(), session.getId()));
         return new ApiResult<Boolean>();
     }
 
@@ -101,8 +101,8 @@ public class ModelController {
     @ResponseBody
     ApiResult<List<Boolean>> getModelTree(
             @RequestParam(value = "projectId", required = false) final Long projectId,
-            HttpSession httpSession) {
-        System.out.println(String.format("getModelTree %d requestId %s", projectId, httpSession.getId()));
+            Session session) {
+        System.out.println(String.format("getModelTree %d requestId %s", projectId, session.getId()));
         return new ApiResult<List<Boolean>>();
     }
 
@@ -111,8 +111,8 @@ public class ModelController {
     @ResponseBody
     ApiResult<Boolean> getModelDetail(
             @RequestParam(value = "projectId", required = false) Long projectId,
-            @RequestParam(value = "modelId", required = false) Long modelId, HttpSession httpSession) {
-        System.out.println(String.format("getModelDetail %d %d requestId %s", projectId, modelId, httpSession.getId()));
+            @RequestParam(value = "modelId", required = false) Long modelId, Session session) {
+        System.out.println(String.format("getModelDetail %d %d requestId %s", projectId, modelId, session.getId()));
         return new ApiResult<Boolean>();
     }
 
@@ -128,8 +128,8 @@ public class ModelController {
             @RequestParam(value = "filterCondition", required = false) String filterCondition,
             @RequestParam(value = "orderField", required = false) String orderField,
             @RequestParam(value = "orderDirection", required = false) Boolean orderDirection,
-            HttpSession httpSession) {
-        System.out.println(String.format("getModelDetail %d %d requestId %s", projectId, pageSize, httpSession.getId()));
+            Session session) {
+        System.out.println(String.format("getModelDetail %d %d requestId %s", projectId, pageSize, session.getId()));
         return new ApiResult<Boolean>();
     }
 
@@ -138,8 +138,8 @@ public class ModelController {
     @ResponseBody
     ApiResult<Boolean> getModelReport(
             @RequestParam(value = "projectId", required = false) Long projectId,
-            @RequestParam(value = "modelId", required = false) Long modelId, HttpSession httpSession) {
-        System.out.println(String.format("getModelReport %d %d requestId %s", projectId, modelId, httpSession.getId()));
+            @RequestParam(value = "modelId", required = false) Long modelId, Session session) {
+        System.out.println(String.format("getModelReport %d %d requestId %s", projectId, modelId, session.getId()));
         return new ApiResult<Boolean>();
     }
 
@@ -148,8 +148,8 @@ public class ModelController {
     @ResponseBody
     ApiResult<Long> createModel(
             @RequestParam(value = "projectId", required = false) Long projectId,
-            @RequestBody ProjectModel createModelParamVo, HttpSession httpSession) {
-        System.out.println(String.format("createModel %d %d requestId %s", projectId, createModelParamVo.getProjectId(), httpSession.getId()));
+            @RequestBody ProjectModel createModelParamVo, Session session) {
+        System.out.println(String.format("createModel %d %d requestId %s", projectId, createModelParamVo.getProjectId(), session.getId()));
         return new ApiResult<Long>();
     }
 
@@ -158,8 +158,8 @@ public class ModelController {
     @ResponseBody
     ApiResult<Boolean> createModelFolder(
             @RequestParam(value = "projectId", required = false) Long projectId,
-            @RequestBody ProjectModel createModelParamVo, HttpSession httpSession) {
-        System.out.println(String.format("createModelFolder %d %d requestId %s", projectId, createModelParamVo.getProjectId(), httpSession.getId()));
+            @RequestBody ProjectModel createModelParamVo, Session session) {
+        System.out.println(String.format("createModelFolder %d %d requestId %s", projectId, createModelParamVo.getProjectId(), session.getId()));
         return new ApiResult<Boolean>();
     }
 
@@ -168,8 +168,8 @@ public class ModelController {
     @ResponseBody
     ApiResult<Boolean> deleteModelConfig(
             @RequestParam(value = "projectId", required = false) Long projectId,
-            @RequestBody ProjectModel idWraperVo, HttpSession httpSession) {
-        System.out.println(String.format("deleteModelConfig %d %d requestId %s", projectId, idWraperVo.getProjectId(), httpSession.getId()));
+            @RequestBody ProjectModel idWraperVo, Session session) {
+        System.out.println(String.format("deleteModelConfig %d %d requestId %s", projectId, idWraperVo.getProjectId(), session.getId()));
         return new ApiResult<Boolean>();
     }
 
@@ -178,8 +178,8 @@ public class ModelController {
     @ResponseBody
     ApiResult<Boolean> deleteModelFolder(
             @RequestParam(value = "projectId", required = false) Long projectId,
-            @RequestBody ProjectModel idWraperVo, HttpSession httpSession) {
-        System.out.println(String.format("deleteModelFolderr %d %d requestId %s", projectId, idWraperVo.getProjectId(), httpSession.getId()));
+            @RequestBody ProjectModel idWraperVo, Session session) {
+        System.out.println(String.format("deleteModelFolderr %d %d requestId %s", projectId, idWraperVo.getProjectId(), session.getId()));
         return new ApiResult<Boolean>();
     }
 
@@ -188,8 +188,8 @@ public class ModelController {
     @ResponseBody
     ApiResult<Boolean> deleteModelReport(
             @RequestParam(value = "projectId", required = false) Long projectId,
-            @RequestBody ProjectModel idWraperVo, HttpSession httpSession) {
-        System.out.println(String.format("deleteModelReportr %d %d requestId %s", projectId, idWraperVo.getProjectId(), httpSession.getId()));
+            @RequestBody ProjectModel idWraperVo, Session session) {
+        System.out.println(String.format("deleteModelReportr %d %d requestId %s", projectId, idWraperVo.getProjectId(), session.getId()));
         return new ApiResult<Boolean>();
     }
 
@@ -198,8 +198,8 @@ public class ModelController {
     @ResponseBody
     ApiResult<Boolean> updateModel(
             @RequestParam(value = "projectId", required = false) Long projectId,
-            @RequestBody ProjectModel modelInfoVo, HttpSession httpSession) {
-        System.out.println(String.format("updateModelr %d %d requestId %s", projectId, modelInfoVo.getProjectId(), httpSession.getId()));
+            @RequestBody ProjectModel modelInfoVo, Session session) {
+        System.out.println(String.format("updateModelr %d %d requestId %s", projectId, modelInfoVo.getProjectId(), session.getId()));
         return new ApiResult<Boolean>();
     }
 
@@ -208,8 +208,8 @@ public class ModelController {
     @ResponseBody
     ApiResult<Boolean> addModelFeature(
             @RequestParam(value = "projectId", required = false) Long projectId,
-            @RequestBody ProjectModel addFeatureVo, HttpSession httpSession) {
-        System.out.println(String.format("addModelFeaturer %d %d requestId %s", projectId, addFeatureVo.getProjectId(), httpSession.getId()));
+            @RequestBody ProjectModel addFeatureVo, Session session) {
+        System.out.println(String.format("addModelFeaturer %d %d requestId %s", projectId, addFeatureVo.getProjectId(), session.getId()));
         return new ApiResult<Boolean>();
     }
 
@@ -218,8 +218,8 @@ public class ModelController {
     @ResponseBody
     ApiResult<Boolean> deleteModelFeature(
             @RequestParam(value = "projectId", required = false) Long projectId,
-            @RequestBody ProjectModel modelFeatureIdVo, HttpSession httpSession) {
-        System.out.println(String.format("deleteModelFeaturer %d %d requestId %s", projectId, modelFeatureIdVo.getProjectId(), httpSession.getId()));
+            @RequestBody ProjectModel modelFeatureIdVo, Session session) {
+        System.out.println(String.format("deleteModelFeaturer %d %d requestId %s", projectId, modelFeatureIdVo.getProjectId(), session.getId()));
         return new ApiResult<Boolean>();
     }
 
@@ -233,8 +233,8 @@ public class ModelController {
             @RequestParam(value = "pageNum", required = false) Integer pageNum,
             @RequestParam(value = "orderField", required = false) String orderField,
             @RequestParam(value = "orderDirection", required = false) Boolean orderDirection,
-            HttpSession httpSession) {
-        System.out.println(String.format("getModelFeatureList %d %d requestId %s", projectId, pageNum, httpSession.getId()));
+            Session session) {
+        System.out.println(String.format("getModelFeatureList %d %d requestId %s", projectId, pageNum, session.getId()));
         return new ApiResult<Boolean>();
     }
 
@@ -243,8 +243,8 @@ public class ModelController {
     @ResponseBody
     ApiResult<Boolean> dealModelAllFeature(
             @RequestParam(value = "projectId", required = false) Long projectId,
-            @RequestBody ProjectModel idWraperVo, HttpSession httpSession) {
-        System.out.println(String.format("dealModelAllFeature %d %d requestId %s", projectId, idWraperVo.getProjectId(), httpSession.getId()));
+            @RequestBody ProjectModel idWraperVo, Session session) {
+        System.out.println(String.format("dealModelAllFeature %d %d requestId %s", projectId, idWraperVo.getProjectId(), session.getId()));
         return new ApiResult<Boolean>();
     }
 
@@ -252,10 +252,10 @@ public class ModelController {
     public
     @ResponseBody
     ApiResult<Boolean> getModelReportSettingDetail(
-            HttpSession httpSession,
+            Session session,
             @RequestParam(value = "projectId", required = true) Long projectId,
             @RequestParam(value = "modelId", required = true) Long modelId) {
-        System.out.println(String.format("getModelReportSettingDetail %d %d requestId %s", projectId, modelId, httpSession.getId()));
+        System.out.println(String.format("getModelReportSettingDetail %d %d requestId %s", projectId, modelId, session.getId()));
         return new ApiResult<Boolean>();
     }
 

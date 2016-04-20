@@ -1,5 +1,5 @@
 package org.nesty.core.server.protocol;
 
 public enum NestyProtocol {
-    HTTP, HTTPS, SPDY, HTTP2
+    HTTP_1_0, HTTP, HTTPS, SPDY, HTTP2
 }

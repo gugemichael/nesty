@@ -2,21 +2,20 @@ package org.nesty.example.httpserver.handler;
 
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import org.nesty.commons.annotations.Interceptor;
-import org.nesty.core.server.rest.HttpContext;
-
+import org.nesty.core.server.rest.RequestContext;
+import org.nesty.core.server.rest.interceptor.HttpInterceptor;
 
 @Interceptor
-public class ServiceInterceptor extends org.nesty.core.server.rest.interceptor.Interceptor {
+public class ServiceInterceptor extends HttpInterceptor {
 
     @Override
-    public boolean filter(final HttpContext context) {
-//        System.out.println(context.getRemoteAddress());
+    public boolean filter(final RequestContext context) {
         return true;
     }
 
     @Override
-    public DefaultFullHttpResponse handler(final HttpContext context, final DefaultFullHttpResponse response) {
-//        System.out.println(response.getHttpStatus());
+    public DefaultFullHttpResponse handler(final RequestContext context, DefaultFullHttpResponse response) {
+        System.out.println("handler uri " + context.getUri());
         return response;
     }
 }

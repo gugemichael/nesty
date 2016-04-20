@@ -55,7 +55,7 @@ public class NestyOptions<T> {
     public static final NestyOptions<Integer> WORKER_THREADS = new NestyOptions<>(128);
 
     /**
-     * logic handler timeout. default is 30s
+     * logic handler time out. default is 30s
      */
     public static final NestyOptions<Integer> TCP_TIMEOUT = new NestyOptions<>((int) TimeUnit.SECONDS.toMillis(30));
 

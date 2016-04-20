@@ -5,20 +5,20 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import java.util.*;
 
 /**
- * Similar javax.servlet and SpringMVC HttpContext implemention
+ * Similar javax.servlet and SpringMVC  implemention
  * parameter. can be used for migration code from SpringMVC
  *
  *
  * Author : Michael
  * Date : March 11, 2016
  */
-public abstract class HttpSession {
+public abstract class Session {
 
     // client request with unique id, fetch it from http header(Request-Id)
     // if exsit. or generate by UUID
     private long creationTime = System.currentTimeMillis();
 
-    public HttpSession() {
+    public Session() {
 
     }
 
@@ -46,9 +46,9 @@ public abstract class HttpSession {
 
     public Object getAttribute(String name) {
         Object value;
-        if ((value = getHttpParams().get(name)) != null)
+        if ((value = getParams().get(name)) != null)
             return value;
-        if ((value = getHttpAttributes().get(name)) != null)
+        if ((value = getAttributes().get(name)) != null)
             return value;
         return null;
     }
@@ -59,8 +59,8 @@ public abstract class HttpSession {
 
     public Enumeration<String> getAttributeNames() {
         return new Enumeration<String>() {
-            Iterator<String> firest = getHttpParams().keySet().iterator();
-            Iterator<String> second = getHttpAttributes().keySet().iterator();
+            Iterator<String> firest = getParams().keySet().iterator();
+            Iterator<String> second = getAttributes().keySet().iterator();
 
             @Override
             public boolean hasMoreElements() {
@@ -79,7 +79,7 @@ public abstract class HttpSession {
     }
 
     public String[] getValueNames() {
-        String[] arr = new String[getHttpParams().keySet().size() + getHttpAttributes().keySet().size()];
+        String[] arr = new String[getParams().keySet().size() + getAttributes().keySet().size()];
         Enumeration<String> names = getAttributeNames();
         int index = 0;
         while (names.hasMoreElements())
@@ -88,7 +88,7 @@ public abstract class HttpSession {
     }
 
     public void setAttribute(String name, Object value) {
-        getHttpAttributes().put(name, value);
+        getAttributes().put(name, value);
     }
 
     public void putValue(String name, Object value) {
@@ -96,8 +96,8 @@ public abstract class HttpSession {
     }
 
     public void removeAttribute(String name) {
-        getHttpAttributes().remove(name);
-        getHttpParams().remove(name);
+        getAttributes().remove(name);
+        getParams().remove(name);
     }
 
     public void removeValue(String name) {
@@ -105,7 +105,7 @@ public abstract class HttpSession {
     }
 
     public void invalidate() {
-        getHttpAttributes().clear();
+        getAttributes().clear();
     }
 
     public boolean isNew() {
@@ -114,7 +114,7 @@ public abstract class HttpSession {
 
     public abstract String getRequestId();
 
-    public abstract Map<String, Object> getHttpAttributes();
+    public abstract Map<String, Object> getAttributes();
 
-    public abstract Map<String, String> getHttpParams();
+    public abstract Map<String, String> getParams();
 }

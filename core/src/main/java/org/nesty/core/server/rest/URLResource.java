@@ -2,7 +2,7 @@ package org.nesty.core.server.rest;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
-import org.nesty.commons.constant.http.RequestMethod;
+import org.nesty.commons.constant.RequestMethod;
 import org.nesty.core.server.utils.HttpUtils;
 
 import java.util.ArrayList;
@@ -24,7 +24,7 @@ public class URLResource {
 
     }
 
-    public static URLResource fromHttp(String url, RequestMethod requestMethod) {
+    public static URLResource fromUri(String url, RequestMethod requestMethod) {
         URLResource resource = new URLResource();
         resource.identifier = URLResourceIdentifier.analyse(url);
         resource.identifier.requestMethod = requestMethod;

@@ -112,8 +112,8 @@ public class ServiceController {
 * Interceptor
 
 ```java
-@org.nesty.commons.annotations.Interceptor
-public class ServiceInterceptor extends Interceptor {
+@Interceptor
+public class ServiceInterceptor extends HttpInterceptor {
 
 	@Override
 	public boolean filter(final HttpContext context) {

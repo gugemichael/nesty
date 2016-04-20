@@ -5,7 +5,7 @@ import org.nesty.commons.annotations.Controller;
 import org.nesty.commons.annotations.RequestBody;
 import org.nesty.commons.annotations.RequestMapping;
 import org.nesty.commons.annotations.RequestParam;
-import org.nesty.commons.constant.http.RequestMethod;
+import org.nesty.commons.constant.RequestMethod;
 import org.nesty.example.httpserver.handler.model.ServiceResponse;
 
 import java.util.List;

@@ -3,14 +3,14 @@ package org.nesty.core.server.protocol;
 import org.nesty.core.server.NestyServer;
 import org.nesty.core.server.acceptor.IOAcceptor;
 
-public class NestyHttpServer extends NestyServer {
+public class NestySpdyServer extends NestyServer {
 
     /**
      * core io acceptor. implement http protocol
      */
     private IOAcceptor ioAcceptor;
 
-    public NestyHttpServer ioAcceptor(IOAcceptor asyncAcceptor) {
+    public NestySpdyServer ioAcceptor(IOAcceptor asyncAcceptor) {
         this.ioAcceptor = asyncAcceptor;
         return this;
     }
@@ -40,6 +40,6 @@ public class NestyHttpServer extends NestyServer {
 
     @Override
     protected NestyProtocol protocol() {
-        return NestyProtocol.HTTP;
+        return NestyProtocol.SPDY;
     }
 }

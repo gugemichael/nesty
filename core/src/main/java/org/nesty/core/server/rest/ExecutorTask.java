@@ -1,78 +1,49 @@
 package org.nesty.core.server.rest;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
-import io.netty.handler.codec.http.DefaultFullHttpResponse;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import org.nesty.commons.utils.SerializeUtils;
 import org.nesty.core.server.rest.controller.URLController;
 import org.nesty.core.server.rest.interceptor.Interceptor;
-import org.nesty.core.server.rest.response.HttpResult;
-import org.nesty.core.server.rest.response.HttpResponseBuilder;
+import org.nesty.core.server.rest.response.ResponseResult;
 
 import java.util.List;
 import java.util.concurrent.Callable;
 
 /**
  * nesty
- *
+ * <p>
  * Author Michael on 03/03/2016.
  */
-public class ExecutorTask implements Callable<DefaultFullHttpResponse> {
+public abstract class ExecutorTask<T> implements Callable<T> {
 
-    // httpContext used for controller invoking
-    private final HttpContext httpContext;
+    // Context used for controller invoking
+    protected final RequestContext requestContext;
     // related controller
-    private final URLController handler;
+    protected final URLController handler;
     // interceptor list
-    private final List<Interceptor> interceptor;
+    protected final List<Interceptor> interceptor;
 
-    public ExecutorTask(HttpContext httpContext, List<Interceptor> interceptor, URLController handler) {
-        this.httpContext = httpContext;
+    public ExecutorTask(RequestContext requestContext, List<Interceptor> interceptor, URLController handler) {
+        this.requestContext = requestContext;
         this.interceptor = interceptor;
         this.handler = handler;
     }
 
     @Override
-    public DefaultFullHttpResponse call() {
+    public T call() {
         // call interceptor chain of filter
         for (Interceptor every : interceptor) {
-            if (!every.filter(httpContext))
-                return HttpResponseBuilder.create(httpContext, HttpResponseStatus.FORBIDDEN);        // httpcode 403
+            if (!every.filter(requestContext))
+                return filterReject();
         }
 
         // call controller method
-        HttpResult result = handler.call(httpContext);
-
-        DefaultFullHttpResponse response;
-
-        switch (result.getHttpStatus()) {
-        case SUCCESS:
-            if (result.getHttpContent() != null) {
-                ByteBuf content = Unpooled.wrappedBuffer(SerializeUtils.encode(result.getHttpContent()));
-                response = HttpResponseBuilder.create(httpContext, content);                                              // httpcode 200
-            } else
-                response = HttpResponseBuilder.create(httpContext, HttpResponseStatus.NO_CONTENT);          // httpcode 204
-            break;
-        case RESPONSE_NOT_VALID:
-            response = HttpResponseBuilder.create(httpContext, HttpResponseStatus.BAD_GATEWAY);            // httpcode 502
-            break;
-        case PARAMS_CONVERT_ERROR:
-        case PARAMS_NOT_MATCHED:
-            response = HttpResponseBuilder.create(httpContext, HttpResponseStatus.BAD_REQUEST);             // httpcode 400
-            break;
-        case SYSTEM_ERROR:
-            response = HttpResponseBuilder.create(httpContext, HttpResponseStatus.INTERNAL_SERVER_ERROR);    // httpcode 500
-            break;
-        default:
-            response = HttpResponseBuilder.create(httpContext, HttpResponseStatus.INTERNAL_SERVER_ERROR);    // httpcode 500
-            break;
-        }
+        T response = process(handler.call(requestContext));
 
         // call interceptor chain of *handler*. returned DefaultFullHttpResponse
         // will be replaced to original instance
         for (Interceptor every : interceptor) {
-            DefaultFullHttpResponse newResponse = every.handler(httpContext, response);
+            @SuppressWarnings("unchecked")
+            T newResponse = (T) every.handler(requestContext, response);
+            // drop null instance
             if (newResponse != null)
                 response = newResponse;
         }
@@ -80,4 +51,7 @@ public class ExecutorTask implements Callable<DefaultFullHttpResponse> {
         return response;
     }
 
+    protected abstract T filterReject();
+
+    protected abstract T process(ResponseResult result);
 }

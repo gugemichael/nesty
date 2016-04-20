@@ -4,7 +4,7 @@ import org.nesty.commons.annotations.Controller;
 import org.nesty.commons.annotations.RequestMapping;
 import org.nesty.commons.annotations.RequestParam;
 import org.nesty.commons.annotations.ResponseBody;
-import org.nesty.commons.constant.http.RequestMethod;
+import org.nesty.commons.constant.RequestMethod;
 
 @Controller
 public class BindController {

@@ -1,0 +1,9 @@
+0.0.3:
+	support SPDY
+	support Http servlet program
+
+0.0.2:
+	merge io threads and logic threads when request is light. (skip logic thread pool)
+
+0.0.1:
+	support Http long connection

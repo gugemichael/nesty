@@ -1,7 +1,7 @@
 package org.nesty.commons.annotations;
 
 import org.nesty.commons.constant.http.HttpConstants;
-import org.nesty.commons.constant.http.RequestMethod;
+import org.nesty.commons.constant.RequestMethod;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

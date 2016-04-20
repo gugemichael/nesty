@@ -3,8 +3,8 @@ package org.nesty.core.server.rest.controller;
 import org.nesty.commons.exception.ControllerParamsNotMatchException;
 import org.nesty.commons.exception.ControllerParamsParsedException;
 import org.nesty.core.server.acceptor.ResultCode;
-import org.nesty.core.server.rest.HttpContext;
-import org.nesty.core.server.rest.response.HttpResult;
+import org.nesty.core.server.rest.RequestContext;
+import org.nesty.core.server.rest.response.ResponseResult;
 import org.nesty.core.server.utils.Hitcounter;
 
 import java.lang.reflect.Method;
@@ -43,9 +43,9 @@ public class URLController extends Hitcounter {
         return this.internal;
     }
 
-    public HttpResult call(HttpContext context) {
+    public ResponseResult call(RequestContext context) {
         /**
-         * make new controller class instance with every http request. because
+         * make new controller class instance with every request. because
          * of we desire every request may has own context variables and status.
          *
          * TODO : This newInstance() need a empty param default constructor.
@@ -55,13 +55,13 @@ public class URLController extends Hitcounter {
         try {
             Object result = procedure.invoke(context);
             if (result != null && !result.getClass().isPrimitive())
-                return new HttpResult(ResultCode.SUCCESS, result);
+                return new ResponseResult(ResultCode.SUCCESS, result);
             else
-                return new HttpResult(ResultCode.RESPONSE_NOT_VALID);
+                return new ResponseResult(ResultCode.RESPONSE_NOT_VALID);
         } catch (ControllerParamsNotMatchException e) {
-            return new HttpResult(ResultCode.PARAMS_NOT_MATCHED);
+            return new ResponseResult(ResultCode.PARAMS_NOT_MATCHED);
         } catch (ControllerParamsParsedException e) {
-            return new HttpResult(ResultCode.PARAMS_CONVERT_ERROR);
+            return new ResponseResult(ResultCode.PARAMS_CONVERT_ERROR);
         }
     }
 

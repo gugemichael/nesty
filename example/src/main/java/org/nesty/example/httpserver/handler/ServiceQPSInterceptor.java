@@ -2,18 +2,19 @@ package org.nesty.example.httpserver.handler;
 
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import org.nesty.commons.annotations.Interceptor;
-import org.nesty.core.server.rest.HttpContext;
+import org.nesty.core.server.rest.RequestContext;
+import org.nesty.core.server.rest.interceptor.HttpInterceptor;
 
 @Interceptor
-public class ServiceQPSInterceptor extends org.nesty.core.server.rest.interceptor.Interceptor {
+public class ServiceQPSInterceptor extends HttpInterceptor {
 
     @Override
-    public boolean filter(final HttpContext context) {
+    public boolean filter(final RequestContext context) {
         return true;
     }
 
     @Override
-    public DefaultFullHttpResponse handler(final HttpContext context, final DefaultFullHttpResponse response) {
+    public DefaultFullHttpResponse handler(final RequestContext context, final DefaultFullHttpResponse response) {
         return response;
     }
 }

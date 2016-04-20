@@ -1,7 +1,7 @@
 package org.nesty.example.httpserver.handler;
 
 import org.nesty.commons.annotations.*;
-import org.nesty.commons.constant.http.RequestMethod;
+import org.nesty.commons.constant.RequestMethod;
 import org.nesty.example.httpserver.handler.model.ProjectModel;
 import org.nesty.example.httpserver.handler.model.ServiceResponse;
 import org.nesty.example.httpserver.handler.model.Type;
@@ -34,14 +34,13 @@ public class ServiceController {
     // [GET] http://host:port/projects
     @RequestMapping("/")
     public ServiceResponse getAllProjects(@Header(value = "Content-Type", required = false) String contentType) {
-        System.out.println("getAllProjects() Content-Type " + contentType);
         return new ServiceResponse();
     }
 
     // [GET] http://host:port/projects/name/my_project1?owner=nesty
     @RequestMapping("/name/{projectName}")
     public ServiceResponse getProjectByName(@PathVariable("projectName") String projectName,
-                                                                @RequestParam(value = "owner", required = false) String owner) {
+                                            @RequestParam(value = "owner", required = false) String owner) {
         System.out.println("getProjectByNam() projectName " + projectName + ", owner " + owner);
         return new ServiceResponse();
     }
@@ -57,7 +56,7 @@ public class ServiceController {
     // [PUT] http://host:port/projects/1
     @RequestMapping(value = "/{projectId}", method = RequestMethod.PUT)
     public ServiceResponse updateProjectNameById(@PathVariable("projectId") Integer projectId, @RequestParam("projectName") String projectName,
-                                                                        @RequestBody ProjectModel project) {
+                                                 @RequestBody ProjectModel project) {
         System.out.println("updateProjectNameById projectId " + projectId + ". projectName " + project.getProjectName());
         return new ServiceResponse();
     }

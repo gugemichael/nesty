@@ -1,6 +1,8 @@
 package org.nesty.core.server.rest.interceptor;
 
+import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import org.nesty.core.server.rest.RequestContext;
+
 
 /**
  * Filter of http request and response
@@ -8,7 +10,7 @@ import org.nesty.core.server.rest.RequestContext;
  * Author : Michael
  * Date : March 09, 2016
  */
-public abstract class Interceptor<T> {
+public class HttpInterceptor extends Interceptor<DefaultFullHttpResponse> {
 
     /**
      * http context of request information. user can update
@@ -17,7 +19,9 @@ public abstract class Interceptor<T> {
      * @param context http context
      * @return true if we continue the request or false will deny the request by http code 403
      */
-    public abstract boolean filter(final RequestContext context);
+    public boolean filter(final RequestContext context) {
+        return true;
+    }
 
     /**
      * http context of request information. user can update
@@ -28,5 +32,7 @@ public abstract class Interceptor<T> {
      * @param response represent response
      * @return response new response instance or current Object instance
      */
-    public abstract T handler(final RequestContext context, T response);
+    public DefaultFullHttpResponse handler(final RequestContext context, DefaultFullHttpResponse response) {
+        return response;
+    }
 }
