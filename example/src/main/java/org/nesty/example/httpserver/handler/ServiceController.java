@@ -1,7 +1,7 @@
 package org.nesty.example.httpserver.handler;
 
 import org.nesty.commons.annotations.*;
-import org.nesty.commons.constant.RequestMethod;
+import org.nesty.commons.constant.http.RequestMethod;
 import org.nesty.example.httpserver.handler.model.ProjectModel;
 import org.nesty.example.httpserver.handler.model.ServiceResponse;
 import org.nesty.example.httpserver.handler.model.Type;

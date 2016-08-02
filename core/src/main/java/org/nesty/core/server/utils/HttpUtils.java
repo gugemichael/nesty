@@ -1,7 +1,7 @@
 package org.nesty.core.server.utils;
 
 import io.netty.handler.codec.http.FullHttpRequest;
-import org.nesty.commons.constant.RequestMethod;
+import org.nesty.commons.constant.http.RequestMethod;
 
 /**
  * nesty

@@ -1,7 +1,7 @@
 package com.nesty.test.billing;
 
 import org.nesty.commons.annotations.*;
-import org.nesty.commons.constant.RequestMethod;
+import org.nesty.commons.constant.http.RequestMethod;
 
 import java.util.List;
 

@@ -4,20 +4,19 @@ import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.handler.timeout.ReadTimeoutException;
+import io.netty.handler.codec.http.FullHttpRequest;
 import org.nesty.core.server.NestyServerMonitor;
-import org.nesty.core.server.rest.ControllerRouter;
-import org.nesty.core.server.rest.controller.URLController;
 import org.nesty.core.server.rest.interceptor.Interceptor;
+import org.nesty.core.server.rest.ControllerRouter;
 
 import java.util.List;
 
 /**
  * nesty
- * <p>
+ *
  * Author Michael on 03/03/2016.
  */
-public abstract class AsyncRequestDispatcher<T> extends SimpleChannelInboundHandler<T> {
+public abstract class AsyncRequestReceiver extends SimpleChannelInboundHandler<FullHttpRequest> {
 
     // resource controller route mapping
     protected static volatile ControllerRouter controllerRouter;
@@ -50,54 +49,4 @@ public abstract class AsyncRequestDispatcher<T> extends SimpleChannelInboundHand
         super.channelInactive(ctx);
         NestyServerMonitor.decrConnections();
     }
-
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        if (cause instanceof ReadTimeoutException)
-            handleTimeout();
-    }
-
-    @Override
-    protected void channelRead0(final ChannelHandlerContext ctx, final T request) throws Exception {
-        // execute async logic code block
-        doRun();
-    }
-
-    private void doRun() {
-
-        /**
-         * 1. checking phase. http method, param, url
-         *
-         */
-        if (!checkup())
-            return;
-
-        /**
-         * 2. find out URLController by URL and params
-         *
-         */
-        URLController controller = findController();
-
-        /**
-         * 3. execute controller logic to async executor thread pool
-         *
-         */
-        if (controller == null)
-            return;
-
-        if (!controller.isInternal()) {
-            NestyServerMonitor.incrRequestHit();
-            controller.hit();
-        }
-
-        execute(controller);
-    }
-
-    protected abstract boolean checkup();
-
-    protected abstract URLController findController();
-
-    protected abstract void execute(URLController controller);
-
-    protected abstract void handleTimeout();
 }

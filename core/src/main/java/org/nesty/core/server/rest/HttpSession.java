@@ -5,20 +5,20 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import java.util.*;
 
 /**
- * Similar javax.servlet and SpringMVC  implemention
+ * Similar javax.servlet and SpringMVC HttpContext implemention
  * parameter. can be used for migration code from SpringMVC
  *
  *
  * Author : Michael
  * Date : March 11, 2016
  */
-public abstract class Session {
+public abstract class HttpSession {
 
     // client request with unique id, fetch it from http header(Request-Id)
     // if exsit. or generate by UUID
     private long creationTime = System.currentTimeMillis();
 
-    public Session() {
+    public HttpSession() {
 
     }
 
@@ -46,9 +46,9 @@ public abstract class Session {
 
     public Object getAttribute(String name) {
         Object value;
-        if ((value = getParams().get(name)) != null)
+        if ((value = getHttpParams().get(name)) != null)
             return value;
-        if ((value = getAttributes().get(name)) != null)
+        if ((value = getHttpAttributes().get(name)) != null)
             return value;
         return null;
     }
@@ -59,8 +59,8 @@ public abstract class Session {
 
     public Enumeration<String> getAttributeNames() {
         return new Enumeration<String>() {
-            Iterator<String> firest = getParams().keySet().iterator();
-            Iterator<String> second = getAttributes().keySet().iterator();
+            Iterator<String> firest = getHttpParams().keySet().iterator();
+            Iterator<String> second = getHttpAttributes().keySet().iterator();
 
             @Override
             public boolean hasMoreElements() {
@@ -79,7 +79,7 @@ public abstract class Session {
     }
 
     public String[] getValueNames() {
-        String[] arr = new String[getParams().keySet().size() + getAttributes().keySet().size()];
+        String[] arr = new String[getHttpParams().keySet().size() + getHttpAttributes().keySet().size()];
         Enumeration<String> names = getAttributeNames();
         int index = 0;
         while (names.hasMoreElements())
@@ -88,7 +88,7 @@ public abstract class Session {
     }
 
     public void setAttribute(String name, Object value) {
-        getAttributes().put(name, value);
+        getHttpAttributes().put(name, value);
     }
 
     public void putValue(String name, Object value) {
@@ -96,8 +96,8 @@ public abstract class Session {
     }
 
     public void removeAttribute(String name) {
-        getAttributes().remove(name);
-        getParams().remove(name);
+        getHttpAttributes().remove(name);
+        getHttpParams().remove(name);
     }
 
     public void removeValue(String name) {
@@ -105,7 +105,7 @@ public abstract class Session {
     }
 
     public void invalidate() {
-        getAttributes().clear();
+        getHttpAttributes().clear();
     }
 
     public boolean isNew() {
@@ -114,7 +114,7 @@ public abstract class Session {
 
     public abstract String getRequestId();
 
-    public abstract Map<String, Object> getAttributes();
+    public abstract Map<String, Object> getHttpAttributes();
 
-    public abstract Map<String, String> getParams();
+    public abstract Map<String, String> getHttpParams();
 }

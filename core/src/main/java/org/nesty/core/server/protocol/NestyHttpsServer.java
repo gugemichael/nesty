@@ -27,9 +27,4 @@ public class NestyHttpsServer extends NestyServer {
     @Override
     public void shutdown() {
     }
-
-    @Override
-    protected NestyProtocol protocol() {
-        return NestyProtocol.HTTPS;
-    }
 }

@@ -2,22 +2,22 @@ package org.nesty.core.server;
 
 import org.nesty.commons.annotations.Controller;
 import org.nesty.commons.annotations.RequestMapping;
-import org.nesty.commons.constant.RequestMethod;
+import org.nesty.commons.constant.http.RequestMethod;
 import org.nesty.commons.exception.ControllerRequestMappingException;
 import org.nesty.commons.utils.ClassUtil;
 import org.nesty.commons.utils.PackageScanner;
-import org.nesty.core.server.protocol.NestyProtocol;
 import org.nesty.core.server.rest.ControllerRouter;
 import org.nesty.core.server.rest.URLResource;
 import org.nesty.core.server.rest.controller.DefaultController;
 import org.nesty.core.server.rest.controller.URLController;
-import org.nesty.core.server.rest.interceptor.HttpInterceptor;
 import org.nesty.core.server.rest.interceptor.Interceptor;
+import org.nesty.core.server.rest.interceptor.InterceptorHelpers;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * scan package route service provider
@@ -27,30 +27,46 @@ import java.util.List;
 public abstract class NestyServer extends NestyOptionProvider implements Server {
 
     // controller router map collection
-    private static final ControllerRouter routerTable = new ControllerRouter();
+    private final ControllerRouter routerTable = new ControllerRouter();
     // interceptors collection
-    private static final List<Interceptor> interceptors = new LinkedList<>();
-    // URI root path
-    private static final String ROOT_PATH = "/";
-
-    static {
-
-        // default Controller (URI path is "/")
-        Method root = DefaultController.class.getMethods()[0];
-        routerTable.register(URLResource.fromUri(ROOT_PATH, RequestMethod.GET), URLController.fromProvider(ROOT_PATH, DefaultController.class, root).internal());
-    }
+    private final List<Interceptor> interceptors = new LinkedList<>();
+    // only once initail scan
+    private final AtomicBoolean scanOver = new AtomicBoolean(false);
+    // root controller
+    private static boolean hasRootController = true;
 
     // scan specified package's all classes
     private PackageScanner scanner = new PackageScanner();
 
     public static void disableInternalController() {
-        routerTable.unregister(URLResource.fromUri(ROOT_PATH, RequestMethod.GET));
+        hasRootController = false;
+    }
+
+    /**
+     * we install internal module here, just one time !
+     */
+    void firstScan() {
+        if (scanOver.compareAndSet(false, true)) {
+            if (hasRootController) {
+                // default Controller (URI path is "/")
+                Method root = DefaultController.class.getMethods()[0];
+                routerTable.register(URLResource.fromHttp("/", RequestMethod.GET), URLController.fromProvider("/", DefaultController.class, root).internal());
+            }
+
+            // internal Interceptor
+            for (InterceptorHelpers interceptor : InterceptorHelpers.values()) {
+                interceptor.instance.install(this);
+                interceptors.add(interceptor.instance);
+            }
+        }
     }
 
     // scan package controller class. NOT Threads-Safe !!
     //
     public NestyServer scanHttpController(String packageName) throws ControllerRequestMappingException {
-        // find all Class
+        firstScan();
+
+        // scan all classes and install them
         List<Class<?>> classList = null;
         try {
             classList = scanner.scan(packageName);
@@ -61,24 +77,12 @@ public abstract class NestyServer extends NestyOptionProvider implements Server 
         RequestMapping clazzLevelRequestMapping = null;
 
         for (Class<?> clazz : classList) {
-            // with @Interceptor
+            // @Interceptor
             if (clazz.getAnnotation(org.nesty.commons.annotations.Interceptor.class) != null) {
                 checkConstructor(clazz);
-
-                Class<?> mustImplement = Interceptor.class;
-                switch (protocol()) {
-                case HTTP_1_0:
-                case HTTP:
-                    mustImplement = HttpInterceptor.class;
-                    break;
-                default:
-                    // TODO : add more types
-                    break;
-                }
-
                 // must implements Interceptor
-                if (clazz.getSuperclass() != mustImplement)
-                    throw new ControllerRequestMappingException(String.format("%s must implements %s", clazz.getName(), mustImplement.getName()));
+                if (clazz.getSuperclass() != Interceptor.class)
+                    throw new ControllerRequestMappingException(String.format("%s must implements %s", clazz.getName(), Interceptor.class.getName()));
 
                 try {
 
@@ -124,13 +128,13 @@ public abstract class NestyServer extends NestyOptionProvider implements Server 
                     // default is RequestMethod.GET if method annotation is not set
                     RequestMethod requestMethod = requestMapping.method();
 
-                    URLResource urlResource = URLResource.fromUri(uri, requestMethod);
+                    URLResource urlResource = URLResource.fromHttp(uri, requestMethod);
                     URLController urlController = URLController.fromProvider(uri, clazz, method);
 
                     /**
                      * register the controller to controller map {@link ControllerRouter}.register() will return
                      * false on dupliacted URLReousource key. Duplicated URLResource means they have same
-                     * url, url variabls and method. we will confuse on them and couldn't decide which
+                     * url, url variabls and http method. we will confuse on them and couldn't decide which
                      * controller method to invoke.
                      *
                      * TODO : we throw exception here. let users to know and decide what to do
@@ -161,6 +165,4 @@ public abstract class NestyServer extends NestyOptionProvider implements Server 
     public List<Interceptor> getInterceptor() {
         return interceptors;
     }
-
-    protected abstract NestyProtocol protocol();
 }

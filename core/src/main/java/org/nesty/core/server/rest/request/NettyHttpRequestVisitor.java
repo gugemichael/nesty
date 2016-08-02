@@ -1,4 +1,4 @@
-package org.nesty.core.server.acceptor.http;
+package org.nesty.core.server.rest.request;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.FluentIterable;
@@ -8,9 +8,7 @@ import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.util.CharsetUtil;
 import org.nesty.commons.constant.http.HttpConstants;
-import org.nesty.commons.constant.RequestMethod;
-import org.nesty.core.server.protocol.NestyProtocol;
-import org.nesty.core.server.rest.request.RequestVisitor;
+import org.nesty.commons.constant.http.RequestMethod;
 import org.nesty.core.server.utils.HttpUtils;
 
 import java.net.InetSocketAddress;
@@ -21,21 +19,21 @@ import java.util.Map;
 
 /**
  * nesty
- * <p>
+ *
  * Author Michael on 03/03/2016.
  */
-public class HttpRequestVisitor implements RequestVisitor {
+public class NettyHttpRequestVisitor implements HttpRequestVisitor {
 
     private final Channel channel;
     private final FullHttpRequest request;
 
-    public HttpRequestVisitor(Channel channel, FullHttpRequest request) {
+    public NettyHttpRequestVisitor(Channel channel, FullHttpRequest request) {
         this.channel = channel;
         this.request = request;
     }
 
     @Override
-    public String remoteAddress() {
+    public String visitRemoteAddress() {
         for (Map.Entry<String, String> entry : request.headers()) {
             if (entry.getKey().equals(HttpConstants.HEADER_X_FORWARDED_FOR))
                 return entry.getValue();
@@ -44,17 +42,17 @@ public class HttpRequestVisitor implements RequestVisitor {
     }
 
     @Override
-    public RequestMethod method() {
+    public RequestMethod visitHttpMethod() {
         return HttpUtils.convertHttpMethodFromNetty(request);
     }
 
     @Override
-    public String body() {
+    public String visitHttpBody() {
         return request.content().toString(CharsetUtil.UTF_8);
     }
 
     @Override
-    public Map<String, String> params() {
+    public Map<String, String> visitHttpParams() {
         Map<String, String> params = new HashMap<>(32);
 
         // from URL
@@ -63,9 +61,9 @@ public class HttpRequestVisitor implements RequestVisitor {
             params.put(item.getKey(), item.getValue().get(0));
 
         // query string and body
-        if (method() != RequestMethod.GET) {
+        if (visitHttpMethod() != RequestMethod.GET) {
             // from content body key-value
-            QueryStringDecoder kvDecoder = new QueryStringDecoder(body(), Charset.forName("UTF-8"), false);
+            QueryStringDecoder kvDecoder = new QueryStringDecoder(visitHttpBody(), Charset.forName("UTF-8"), false);
             for (Map.Entry<String, List<String>> item : kvDecoder.parameters().entrySet())
                 params.put(item.getKey(), item.getValue().get(0));
         }
@@ -74,7 +72,7 @@ public class HttpRequestVisitor implements RequestVisitor {
     }
 
     @Override
-    public Map<String, String> headers() {
+    public Map<String, String> visitHttpHeaders() {
         Map<String, String> headers = new HashMap<>(32);
         for (Map.Entry<String, String> entry : request.headers())
             headers.put(entry.getKey(), entry.getValue());
@@ -82,19 +80,18 @@ public class HttpRequestVisitor implements RequestVisitor {
     }
 
     @Override
-    public String uri() {
+    public String visitURI() {
         return request.getUri();
     }
 
     @Override
-    public String[] terms() {
+    public String[] visitTerms() {
         String termsUrl = HttpUtils.truncateUrl(request.getUri());
         return FluentIterable.from(Splitter.on('/').omitEmptyStrings().trimResults().split(termsUrl)).toArray(String.class);
     }
 
     @Override
-    public NestyProtocol protocol() {
-        return (request.getProtocolVersion().equals(HttpVersion.HTTP_1_0)) ? NestyProtocol.HTTP_1_0 : NestyProtocol.HTTP;
+    public HttpVersion visitHttpVersion() {
+        return request.getProtocolVersion();
     }
-
 }

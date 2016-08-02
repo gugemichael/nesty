@@ -1,4 +1,4 @@
-package org.nesty.commons.constant;
+package org.nesty.commons.constant.http;
 
 /**
  * nesty

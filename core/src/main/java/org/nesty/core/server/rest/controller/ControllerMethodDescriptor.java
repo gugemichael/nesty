@@ -8,8 +8,8 @@ import org.nesty.commons.exception.ControllerParamsNotMatchException;
 import org.nesty.commons.exception.ControllerParamsParsedException;
 import org.nesty.commons.exception.SerializeException;
 import org.nesty.commons.utils.SerializeUtils;
-import org.nesty.core.server.rest.RequestContext;
-import org.nesty.core.server.rest.Session;
+import org.nesty.core.server.rest.HttpContext;
+import org.nesty.core.server.rest.HttpSession;
 import org.nesty.core.server.rest.URLResource;
 import org.nesty.core.server.rest.controller.ControllerMethodDescriptor.MethodParams.AnnotationType;
 
@@ -19,7 +19,7 @@ import java.lang.reflect.Method;
 
 /**
  * controller method descriptor include annotation params
- *
+ * <p>
  * Author : Michael
  * Date : March 07, 2016
  */
@@ -45,8 +45,8 @@ public class ControllerMethodDescriptor {
         // TODO : ugly code here !! messy
         //
         for (int i = 0; i != total; i++) {
-            if (paramsTypes[i] == Session.class) {
-                params[i] = new MethodParams(null, Session.class);
+            if (paramsTypes[i] == HttpSession.class) {
+                params[i] = new MethodParams(null, HttpSession.class);
                 params[i].annotationType = AnnotationType.HTTP_SESSION;
             } else {
                 params[i] = new MethodParams(annotations[i][0], paramsTypes[i]);
@@ -88,7 +88,7 @@ public class ControllerMethodDescriptor {
         }
     }
 
-    public Object invoke(RequestContext context) throws ControllerParamsNotMatchException, ControllerParamsParsedException {
+    public Object invoke(HttpContext context) throws ControllerParamsNotMatchException, ControllerParamsParsedException {
         try {
             if (params != null)
                 return method.invoke(target, resolveParams(context));
@@ -109,7 +109,7 @@ public class ControllerMethodDescriptor {
         }
     }
 
-    private Object[] resolveParams(RequestContext context) throws ControllerParamsNotMatchException, ControllerParamsParsedException {
+    private Object[] resolveParams(HttpContext context) throws ControllerParamsNotMatchException, ControllerParamsParsedException {
         Object[] paramList = new Object[params.length];
 
         String value = null;
@@ -124,21 +124,23 @@ public class ControllerMethodDescriptor {
                 break;
             case HEADER:
                 Header header = (Header) params[i].annotation;
-                value = context.getHeaders().get(header.value());
+                value = context.getHttpHeaders().get(header.value());
                 // only if required is fase
                 if (value == null && !header.required())
                     required = false;
                 break;
             case REQUEST_PARAM:
                 RequestParam reqParam = (RequestParam) params[i].annotation;
-                value = context.getParams().get(reqParam.value());
+                value = context.getHttpParams().get(reqParam.value());
                 // only if required is fase
                 if (value == null && !reqParam.required())
                     required = false;
                 break;
             case REQUEST_BODY:
-                value = context.getBody();
-                serialize = true;
+                value = context.getHttpBody();
+                // we pass value directly on parameter's type is String.class
+                if (params[i].clazz != String.class)
+                    serialize = true;
                 break;
             case PATH_VARIABLE:
                 PathVariable pathParam = (PathVariable) params[i].annotation;
@@ -160,7 +162,7 @@ public class ControllerMethodDescriptor {
         return paramList;
     }
 
-    private Object parseParam(Class<?> clazz, String value, boolean serialize, RequestContext context) throws SerializeException {
+    private Object parseParam(Class<?> clazz, String value, boolean serialize, HttpContext context) throws SerializeException {
         // need body serialize parsed
         if (serialize) {
             return value != null ? SerializeUtils.decode(value, clazz) : null;
@@ -175,9 +177,9 @@ public class ControllerMethodDescriptor {
             return null;
         }
 
-        // Session inject
-        if (clazz == Session.class) {
-            // Session is the super class of Context
+        // HttpSession inject
+        if (clazz == HttpSession.class) {
+            // HttpSession is the super class of HttpContext
             return context;
         }
 

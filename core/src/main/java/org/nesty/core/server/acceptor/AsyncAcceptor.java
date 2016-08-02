@@ -5,13 +5,9 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.timeout.ReadTimeoutHandler;
 import org.nesty.core.server.NestyOptionProvider;
 import org.nesty.core.server.NestyOptions;
 import org.nesty.core.server.NestyServer;
-import org.nesty.core.server.acceptor.http.AsyncHttpHandler;
-
-import java.util.concurrent.TimeUnit;
 
 /**
  * nesty
@@ -24,6 +20,7 @@ public abstract class AsyncAcceptor implements IOAcceptor {
     private final int port;
 
     private final NestyServer nestyServer;
+
 
     private ChannelFuture serverSocket;
     private EventLoopGroup bossGroup;
@@ -56,9 +53,9 @@ public abstract class AsyncAcceptor implements IOAcceptor {
         workerGroup = new NioEventLoopGroup(rwThreads);
 
         // initial request router's work threads
-        AsyncHttpHandler.newTaskPool(nestyServer.option(NestyOptions.WORKER_THREADS));
-        AsyncHttpHandler.useURLResourceController(nestyServer.getRouteController());
-        AsyncHttpHandler.useInterceptor(nestyServer.getInterceptor());
+        AsyncRequestHandler.newTaskPool(nestyServer.option(NestyOptions.WORKER_THREADS));
+        AsyncRequestHandler.useURLResourceController(nestyServer.getRouteController());
+        AsyncRequestHandler.useInterceptor(nestyServer.getInterceptor());
 
         ServerBootstrap socketServer = new ServerBootstrap();
         socketServer.group(bossGroup, workerGroup)
@@ -66,9 +63,7 @@ public abstract class AsyncAcceptor implements IOAcceptor {
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     public void initChannel(SocketChannel ch) throws Exception {
-                        ch.pipeline()
-                                .addLast("nesty-timer", new ReadTimeoutHandler(nestyServer.option(NestyOptions.TCP_TIMEOUT), TimeUnit.MILLISECONDS));
-                        buildPipeline(ch.pipeline(), nestyServer);
+                        protocolPipeline(ch.pipeline(), nestyServer);
                     }
                 })
                 .option(ChannelOption.SO_TIMEOUT, nestyServer.option(NestyOptions.TCP_TIMEOUT))
@@ -97,5 +92,5 @@ public abstract class AsyncAcceptor implements IOAcceptor {
         bossGroup.shutdownGracefully();
     }
 
-    protected abstract void buildPipeline(ChannelPipeline pipeline, NestyOptionProvider options);
+    protected abstract void protocolPipeline(ChannelPipeline pipeline, NestyOptionProvider options);
 }

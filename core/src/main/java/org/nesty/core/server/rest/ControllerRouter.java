@@ -1,6 +1,6 @@
 package org.nesty.core.server.rest;
 
-import org.nesty.commons.constant.RequestMethod;
+import org.nesty.commons.constant.http.RequestMethod;
 import org.nesty.core.server.rest.controller.URLController;
 
 import java.util.Map;
@@ -41,23 +41,23 @@ public class ControllerRouter {
 
     public synchronized boolean register(URLResource resource, URLController controller) {
         Indexer indexer = new Indexer(resource);
-        if (mapper[indexer.MethodIndex][indexer.TermsIndex] == null)
-            mapper[indexer.MethodIndex][indexer.TermsIndex] = new URLMapper();
-        return mapper[indexer.MethodIndex][indexer.TermsIndex].register(resource, controller);
+        if (mapper[indexer.HttpMethodIndex][indexer.TermsIndex] == null)
+            mapper[indexer.HttpMethodIndex][indexer.TermsIndex] = new URLMapper();
+        return mapper[indexer.HttpMethodIndex][indexer.TermsIndex].register(resource, controller);
     }
 
     public synchronized void unregister(URLResource resource) {
         Indexer indexer = new Indexer(resource);
-        if (mapper[indexer.MethodIndex][indexer.TermsIndex] != null)
-            mapper[indexer.MethodIndex][indexer.TermsIndex].unregister(resource);
+        if (mapper[indexer.HttpMethodIndex][indexer.TermsIndex] != null)
+            mapper[indexer.HttpMethodIndex][indexer.TermsIndex].unregister(resource);
     }
 
     static class Indexer {
-        public int MethodIndex;
+        public int HttpMethodIndex;
         public int TermsIndex;
 
         public Indexer(URLResource resource) {
-            MethodIndex = resource.requestMethod().ordinal();
+            HttpMethodIndex = resource.requestMethod().ordinal();
             TermsIndex = resource.fragments().size();
         }
     }
