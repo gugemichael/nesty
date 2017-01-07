@@ -7,6 +7,7 @@ import org.nesty.core.server.rest.request.HttpRequestVisitor;
 
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * http context. include all http request and response information
@@ -14,6 +15,8 @@ import java.util.UUID;
  * Author Michael on 03/03/2016.
  */
 public class HttpContext extends HttpSession {
+    private static String NestyUID = UUID.randomUUID().toString();
+    private static AtomicLong SequenceId = new AtomicLong(0);
 
     // raw body
     protected String httpBody;
@@ -25,7 +28,7 @@ public class HttpContext extends HttpSession {
     protected Map<String, String> httpHeaders;
     // client request with unique id, fetch it from http header(Request-Id)
     // if exsit. or generate by UUID
-    private String requestId = UUID.randomUUID().toString();
+    private String requestId = String.format("%s-%d", NestyUID, SequenceId.incrementAndGet());
     // ip address from origin client, fetch it from getRemoteAddr()
     // or header X-FORWARDED-FOR
     private String remoteAddress;
