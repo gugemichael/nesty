@@ -6,18 +6,11 @@ Http Restful API framework implemention with Netty
 
 `develop` with v0.0.3
 
-## changeslog 
-
-0.0.2
-* http long connection supported (Connection: keep-alive)
-* root url path (analogous to http://ip:port/ directly) for stats and counter information
-
-0.0.1 
-* original snapshot version
-
 ## Features
 
-* Http HTTP/1.1 protocol support 
+* Both Http HTTP/1.1 and HTTP/1.0 protocol support 
+* Http long connection supported (also Connection: keep-alive)
+* Internal stats with root url path (analogous to http://ip:port/ directly)
 
 `GET, POST, UPDAT, EDELETE`
 
