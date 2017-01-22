@@ -1,14 +1,16 @@
 # Nesty
-Http RESTful Api implemention on Netty async io
+Http Restful API framework implemention with Netty 
 
 ## Lastest version
-0.0.2
+`stable` with v0.0.2
+
+`develop` with v0.0.3
 
 ## changeslog 
 
 0.0.2
-* support http long connection(Connection: keep-alive)
-* support root path (uri path is /) stats and counter information
+* http long connection supported (Connection: keep-alive)
+* root url path (analogous to http://ip:port/ directly) for stats and counter information
 
 0.0.1 
 * original snapshot version
@@ -17,8 +19,7 @@ Http RESTful Api implemention on Netty async io
 
 * Http HTTP/1.1 protocol support 
 
-GET | POST | UPDATE | DELETE
---- | --- | --- | ---
+`GET, POST, UPDAT, EDELETE`
 
 * Http Restful serialized (usually as json) in string body (With Gson)
 * Http Short Connection on async mode by default (With Netty 4.2)
@@ -42,7 +43,6 @@ Enum | null | enum class type
 Class | null | from http body serializer parsed
 
 ## TODO
-* Long connection support (require explict Connection: Keep-Alive header set)
 * Spring or Mybatis intergrated
 
 
