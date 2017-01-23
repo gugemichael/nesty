@@ -2,16 +2,15 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<parent>                                                                                                                                                                                                                                                                  
-		<groupId>com.taobao</groupId>
-		<artifactId>parent</artifactId>
-		<version>1.0.2</version>
-	</parent>
-
 	<artifactId>nesty-all</artifactId>
 	<groupId>org.nesty</groupId>
 	<packaging>pom</packaging>
-	<version>0.0.2-SNAPSHOT</version>
+	<version>0.0.3-SNAPSHOT</version>
+
+	<name>Nesty</name>
+	<description>Restful http programing framework. based on Netty</description>
+	<url>https://github.com/gugemichael/nesty</url>
+
 	<modules>
 		<module>commons</module>
 		<module>core</module>
@@ -35,9 +34,9 @@
             <version>17.0</version>
         </dependency>
         <dependency>
-            <groupId>com.google.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.2.4</version>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.2.4</version>
         </dependency>
 	</dependencies>
 
@@ -67,11 +66,21 @@
 					</execution>
 				</executions>
 			</plugin>
-
 		</plugins>
 
-
-
 	</build>
+
+	<licenses>
+		<license>
+			<name>Apache License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<scm>
+		<url>https://svn.apache.org/viewvc/maven</url>
+	</scm>
+
 
 </project>

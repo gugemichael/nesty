@@ -165,4 +165,12 @@ public abstract class NestyServer extends NestyOptionProvider implements Server 
     public List<Interceptor> getInterceptor() {
         return interceptors;
     }
+
+    @Override
+    public void shutdown() {
+        if (!this.interceptors.isEmpty()) {
+            for (Interceptor interceptor : this.interceptors)
+                interceptor.destroy();
+        }
+    }
 }

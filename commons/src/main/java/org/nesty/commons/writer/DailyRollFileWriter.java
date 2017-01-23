@@ -74,8 +74,10 @@ public class DailyRollFileWriter extends GenericFileWriter {
                     /**
                      * 4. safe close
                      */
-                    close.flush();
-                    close.close();
+                    if (close != null) {
+                        close.flush();
+                        close.close();
+                    }
                 }
             }
 

@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>nesty-all</artifactId>
 		<groupId>org.nesty</groupId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>0.0.3-SNAPSHOT</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
@@ -17,7 +17,7 @@
         <dependency>
             <groupId>org.nesty.core</groupId>
             <artifactId>nesty-core</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>0.0.3-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
