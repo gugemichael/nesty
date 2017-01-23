@@ -11,14 +11,15 @@ public class SimpleHttpServer {
     public static void main(String[] args) throws ControllerRequestMappingException, InterruptedException {
 
         // 1. create httpserver
-        NestyServer server = AsyncServerProvider.builder().address("127.0.0.1").port(8080)
-                                                                        .service(NestyProtocol.HTTP);
+        final NestyServer server = AsyncServerProvider.builder().address("127.0.0.1").port(8080)
+                .service(NestyProtocol.HTTP);
 
         // 2. choose http params. this is unnecessary
         server.option(NestyOptions.IO_THREADS, Runtime.getRuntime().availableProcessors())
                 .option(NestyOptions.WORKER_THREADS, 128)
                 .option(NestyOptions.TCP_BACKLOG, 1024)
-                .option(NestyOptions.TCP_NODELAY, true);
+                .option(NestyOptions.TCP_NODELAY, true)
+                .option(NestyOptions.ACCESS_LOG, "/tmp/accesslog");
 
         // 3. scan defined controller class with package name
         server.scanHttpController("com.nesty.test.neptune")
@@ -32,6 +33,7 @@ public class SimpleHttpServer {
         server.join();
 
         // would not to reach here as usual ......
+        server.shutdown();
     }
 }
 

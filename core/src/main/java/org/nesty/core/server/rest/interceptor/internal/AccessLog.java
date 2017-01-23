@@ -58,6 +58,12 @@ public class AccessLog extends Interceptor {
         return super.install(nesty);
     }
 
+    @Override
+    public void destroy() {
+        if (accessLogAppender != null) {
+            accessLogAppender.close();
+        }
+    }
 
     class AccessLogGenerator {
 

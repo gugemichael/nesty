@@ -3,19 +3,17 @@ package org.nesty.commons.writer;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class GenericFileWriter implements FileWriter {
 
     /**
      * thread cached calender instances
      */
-    private ThreadLocal<ByteArrayBuffer> arena = new ThreadLocal<ByteArrayBuffer>() {
-        @Override
-        protected ByteArrayBuffer initialValue() {
-            // Java fill the array buffer with zero
-            return new ByteArrayBuffer();
-        }
-    };
+    private ConcurrentMap<Long, ByteArrayBuffer> arena = new ConcurrentHashMap<>(64);
 
     private static final String seperator = String.format("%n");
 
@@ -32,6 +30,9 @@ public class GenericFileWriter implements FileWriter {
     protected volatile FileOutputStream out;
 
     private final boolean buffered;
+
+    private final AtomicLong refcount = new AtomicLong(1);
+    private final AtomicBoolean isOpen = new AtomicBoolean(true);
 
     public GenericFileWriter(boolean buffered) {
         this.buffered = buffered;
@@ -77,13 +78,19 @@ public class GenericFileWriter implements FileWriter {
         write(line.getBytes(), 0, line.length());
     }
 
+    private void ensureArena() {
+        if (!arena.containsKey(Thread.currentThread().getId()))
+            arena.put(Thread.currentThread().getId(), new ByteArrayBuffer());
+    }
+
     /**
      * write byte[] conent
      */
     @Override
     public void write(byte[] content, int offset, int count) {
         if (buffered) {
-            ByteArrayBuffer buffer = arena.get();
+            ensureArena();
+            ByteArrayBuffer buffer = arena.get(Thread.currentThread().getId());
             // flush directly if we have no space to reserve
             if (!buffer.ensureCapacity(count)) {
                 doWrite(buffer.getBuffer(), 0, buffer.getOffset());
@@ -98,13 +105,31 @@ public class GenericFileWriter implements FileWriter {
     private void doWrite(byte[] content, int offset, int count) {
         if (content != null && count > 0 && offset >= 0) {
             try {
-                out.write(content, offset, count);
+                if (out != null && acquireWriteStamp()) {
+                    out.write(content, offset, count);
+                    releaseStamp();
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
     }
 
+    private boolean acquireWriteStamp() {
+        return isOpen.get() && refcount.get() != 0 && refcount.incrementAndGet() > 1;
+    }
+
+    private void releaseStamp() {
+        if (refcount.decrementAndGet() == 0) {
+            try {
+                out.flush();
+                out.close();
+                out = null;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     /**
      * flush the buffered content if this writer buffered enable
@@ -113,10 +138,13 @@ public class GenericFileWriter implements FileWriter {
     public void flush() {
         try {
             if (buffered) {
-                //flush buffered content first of all
-                ByteArrayBuffer buffer = arena.get();
-                if (buffer.getOffset() != 0)
-                    doWrite(buffer.getBuffer(), 0, buffer.getOffset());
+                synchronized (this) {
+                    //flush all threads buffered content
+                    for (ByteArrayBuffer buffer : arena.values()) {
+                        if (buffer.getOffset() != 0)
+                            doWrite(buffer.getBuffer(), 0, buffer.getOffset());
+                    }
+                }
             }
             out.flush();
         } catch (IOException e) {
@@ -126,12 +154,9 @@ public class GenericFileWriter implements FileWriter {
 
     @Override
     public void close() {
+        isOpen.set(false);
         flush();
-        try {
-            out.close();
-            out = null;
-        } catch (IOException ignored) {
-        }
+        releaseStamp();
     }
 
     protected String getFileName() {

@@ -16,6 +16,9 @@ public abstract class Interceptor {
         return true;
     }
 
+    public void destroy() {
+    }
+
     /**
      * http context of request information. user can update
      * the value of context.
