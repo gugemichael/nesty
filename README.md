@@ -6,9 +6,9 @@ Homepage please visit http://gugemichael.github.io/nesty/
 
 
 ## Lastest version
-`stable` with v0.0.2
+`stable` with __master__ branch or __v0.0.3__ branch
 
-`develop` with v0.0.3
+`develop` with __v0.0.4__ branch
 
 ## Features
 
@@ -174,8 +174,8 @@ Http short connection
 * Latency : < 10ms
 
 Http long connection (Connection: keep-alive)
-* Conccurent : 512 http connections 
-* Qps : 80,000 ~ 100,000
+* Conccurent : 4096 http connections 
+* Qps : 180,000 ~ 200,000
 * Latency : < 50ms
 
 detail : https://github.com/gugemichael/nesty/wiki/Performance-Detail
