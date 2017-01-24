@@ -92,22 +92,25 @@ public class GenericFileWriter implements FileWriter {
             ensureArena();
             ByteArrayBuffer buffer = arena.get(Thread.currentThread().getId());
             // flush directly if we have no space to reserve
-            if (!buffer.ensureCapacity(count)) {
-                doWrite(buffer.getBuffer(), 0, buffer.getOffset());
+            if (!buffer.ensureCapacity(count) || !isOpen.get()) {
+                doWrite(buffer.getBuffer(), 0, buffer.getOffset(), false);
                 buffer.clear();
             }
             buffer.append(content, offset, count);
         } else {
-            doWrite(content, offset, count);
+            doWrite(content, offset, count, false);
         }
     }
 
-    private void doWrite(byte[] content, int offset, int count) {
+    private void doWrite(byte[] content, int offset, int count, boolean force) {
         if (content != null && count > 0 && offset >= 0) {
             try {
                 if (out != null && acquireWriteStamp()) {
-                    out.write(content, offset, count);
+                    if (isOpen.get())
+                        out.write(content, offset, count);
                     releaseStamp();
+                } else if (force) {
+                    out.write(content, offset, count);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -141,8 +144,10 @@ public class GenericFileWriter implements FileWriter {
                 synchronized (this) {
                     //flush all threads buffered content
                     for (ByteArrayBuffer buffer : arena.values()) {
-                        if (buffer.getOffset() != 0)
-                            doWrite(buffer.getBuffer(), 0, buffer.getOffset());
+                        if (buffer.getOffset() != 0) {
+                            doWrite(buffer.getBuffer(), 0, buffer.getOffset(), true);
+                            buffer.clear();
+                        }
                     }
                 }
             }
@@ -155,7 +160,18 @@ public class GenericFileWriter implements FileWriter {
     @Override
     public void close() {
         isOpen.set(false);
-        flush();
+        // flush own thread buffer
+        ByteArrayBuffer buffer = arena.get(Thread.currentThread().getId());
+        if (buffer != null && buffer.getOffset() != 0) {
+            doWrite(buffer.getBuffer(), 0, buffer.getOffset(), true);
+            buffer.clear();
+        }
+
+        // take a look at others buffer. we flush them if only if
+        // there has no writer
+        if (refcount.get() == 1) {
+            flush();
+        }
         releaseStamp();
     }
 
