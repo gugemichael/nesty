@@ -13,7 +13,7 @@ import java.util.List;
 
 /**
  * nesty
- *
+ * <p>
  * Author Michael on 03/03/2016.
  */
 public abstract class AsyncRequestReceiver extends SimpleChannelInboundHandler<FullHttpRequest> {
@@ -26,7 +26,7 @@ public abstract class AsyncRequestReceiver extends SimpleChannelInboundHandler<F
     protected static volatile ListeningExecutorService ioWorker;
 
     public static void newTaskPool(int workers) {
-        if (workers >= 0)
+        if (workers > 0)
             ioWorker = MoreExecutors.listeningDecorator(IoWorker.newExecutors(workers));
     }
 

@@ -11,7 +11,7 @@ import org.nesty.core.server.NestyServer;
 
 /**
  * nesty
- *
+ * <p>
  * Author Michael on 03/03/2016.
  */
 public abstract class AsyncAcceptor implements IOAcceptor {
@@ -47,7 +47,7 @@ public abstract class AsyncAcceptor implements IOAcceptor {
         //
         // HttpAdapter 's "business logic flow" has params building, validation,
         // logging , so we increase this pool percent in MaxThreads
-        int rwThreads = Math.max(4, ((int) (nestyServer.option(NestyOptions.IO_THREADS) * 0.7) & 0xFFFFFFFE));
+        int rwThreads = Math.max(4, nestyServer.option(NestyOptions.IO_THREADS));
 
         bossGroup = new NioEventLoopGroup(acceptThreads);
         workerGroup = new NioEventLoopGroup(rwThreads);
