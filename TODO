@@ -1,6 +1,12 @@
+0.0.4:
+	jprofiler performance tunning
+		* gson upgrade -> performance sensitive
+		* HttpVisitor optimize
+		* writeAndFlush block too much
+
 0.0.3:
-	support SPDY
-	support Http servlet program
+	GenericFileWriter bugfix
+	WorkerThread pool needs WORKER_THREADS > 0
 
 0.0.2:
 	merge io threads and logic threads when request is light. (skip logic thread pool)
