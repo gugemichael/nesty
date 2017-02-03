@@ -12,8 +12,8 @@ Homepage please visit http://gugemichael.github.io/nesty/
 
 ## Features
 
-* Both Http HTTP/1.1 and HTTP/1.0 protocol support 
-* Http long connection supported (also Connection: keep-alive)
+* HTTP/1.1 and HTTP/1.0 protocol support 
+* Http Long-connection supported (also Connection: keep-alive)
 * Internal stats with root url path (analogous to http://ip:port/ directly)
 
 `GET, POST, UPDAT, EDELETE`
@@ -40,8 +40,10 @@ Enum | null | enum class type
 Class | null | from http body serializer parsed
 
 ## TODO
+
 * Spring or Mybatis intergrated
 
+* Http 2.0 support
 
 ## Usage
 
