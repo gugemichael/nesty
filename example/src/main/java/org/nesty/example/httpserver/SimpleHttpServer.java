@@ -9,7 +9,10 @@ import org.nesty.core.server.protocol.NestyProtocol;
 public class SimpleHttpServer {
 
     public static void main(String[] args) throws ControllerRequestMappingException, InterruptedException {
+        startServer(args, false);
+    }
 
+    public static void startServer(String[] args, boolean withSpringController) throws ControllerRequestMappingException, InterruptedException {
         // 1. create httpserver
         final NestyServer server = AsyncServerProvider.builder().address("127.0.0.1").port(8080)
                 .service(NestyProtocol.HTTP);
@@ -25,6 +28,10 @@ public class SimpleHttpServer {
         server.scanHttpController("com.nesty.test.neptune")
                 .scanHttpController("com.nesty.test.billing")
                 .scanHttpController("org.nesty.example.httpserver.handler");
+
+        if (withSpringController) {
+            server.scanHttpController("org.nesty.example.httpserver.spring");
+        }
 
         // 4. start http server
         if (!server.start())
