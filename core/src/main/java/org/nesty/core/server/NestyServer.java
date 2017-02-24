@@ -12,6 +12,8 @@ import org.nesty.core.server.rest.controller.DefaultController;
 import org.nesty.core.server.rest.controller.URLController;
 import org.nesty.core.server.rest.interceptor.Interceptor;
 import org.nesty.core.server.rest.interceptor.InterceptorHelpers;
+import org.nesty.core.server.springplus.ApplicationContextProvider;
+import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -94,7 +96,15 @@ public abstract class NestyServer extends NestyOptionProvider implements Server 
                      * TODO : may be we can indecate the previous {@link org.nesty.commons.annotations.Interceptor} manully
                      *
                      */
-                    interceptors.add((Interceptor) clazz.newInstance());
+
+                    Interceptor wanted;
+                    if (clazz.getAnnotation(Component.class) != null) {
+                        wanted = (Interceptor) ApplicationContextProvider.get(clazz);
+                    } else {
+                        wanted = (Interceptor)clazz.newInstance();
+                    }
+
+                    interceptors.add(wanted);
                 } catch (InstantiationException | IllegalAccessException e) {
                     throw new ControllerRequestMappingException(String.format("%s newInstance() failed %s", clazz.getName(), e.getMessage()));
                 }

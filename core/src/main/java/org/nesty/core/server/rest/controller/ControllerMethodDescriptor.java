@@ -12,6 +12,8 @@ import org.nesty.core.server.rest.HttpContext;
 import org.nesty.core.server.rest.HttpSession;
 import org.nesty.core.server.rest.URLResource;
 import org.nesty.core.server.rest.controller.ControllerMethodDescriptor.MethodParams.AnnotationType;
+import org.nesty.core.server.springplus.ApplicationContextProvider;
+import org.springframework.stereotype.Component;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -82,7 +84,12 @@ public class ControllerMethodDescriptor {
         }
 
         try {
-            target = clazz.getClazz().newInstance();
+            Class<?> klass = clazz.getClazz();
+            if (klass.getAnnotation(Component.class) != null) {
+                target = ApplicationContextProvider.get(klass);
+            } else {
+                target = klass.newInstance();
+            }
         } catch (InstantiationException | IllegalAccessException ignored) {
             ignored.printStackTrace();
         }
