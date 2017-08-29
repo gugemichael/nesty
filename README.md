@@ -5,9 +5,6 @@ Http Restful API framework implemention with Netty
 Homepage please visit http://gugemichael.github.io/nesty/
 
 
-
-
-
 ## Lastest version
 `stable` with __master__ branch or __v0.0.3__ branch
 
