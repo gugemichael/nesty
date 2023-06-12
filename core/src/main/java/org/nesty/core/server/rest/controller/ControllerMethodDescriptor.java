@@ -133,7 +133,7 @@ public class ControllerMethodDescriptor {
                 RequestParam reqParam = (RequestParam) params[i].annotation;
                 value = context.getHttpParams().get(reqParam.value());
                 // only if required is fase
-                if (value == null && !reqParam.required())
+                if ((value == null || value.isEmpty()) && !reqParam.required())
                     required = false;
                 break;
             case REQUEST_BODY:
@@ -149,7 +149,7 @@ public class ControllerMethodDescriptor {
                 break;
             }
 
-            if ((value == null || value.isEmpty()) && required && !auto)
+            if (required && !auto && (value == null || value.isEmpty()))
                 throw new ControllerParamsNotMatchException(String.format("resolve %s failed", params[i].annotation.annotationType().getName()));
 
             try {
